@@ -168,6 +168,10 @@ impl<T: PackedElement> PackedVec<T> {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
     pub fn push(&mut self, value: u32) {
         if value > T::MAX {
             panic!("value is outside the range 0..={}", T::MAX);
@@ -281,7 +285,7 @@ mod tests {
             v2.push(*x);
         }
 
-        assert_eq!(v2.len, v1.len());
+        assert_eq!(v2.len(), v1.len());
         assert_eq!(v2.get(0).unwrap(), v1[0]);
         assert_eq!(v2.get(1).unwrap(), v1[1]);
         assert_eq!(v2.get(2).unwrap(), v1[2]);
@@ -298,7 +302,7 @@ mod tests {
             v2.push(*x);
         }
 
-        assert_eq!(v2.len, v1.len());
+        assert_eq!(v2.len(), v1.len());
         assert_eq!(v2.get(0).unwrap(), v1[0]);
         assert_eq!(v2.get(1).unwrap(), v1[1]);
         assert_eq!(v2.get(2).unwrap(), v1[2]);
