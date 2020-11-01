@@ -34,7 +34,7 @@ pub enum U31 {}
 
 pub trait PackedElement {
     const NUM_BITS: usize;
-    const MAX: usize = (1 << Self::NUM_BITS) - 1;
+    const MAX: u32 = (1 << Self::NUM_BITS) - 1;
 }
 
 impl PackedElement for U1 {
@@ -158,18 +158,18 @@ impl<T: PackedElement> PackedVec<T> {
         let available_bits = Self::U32_NUM_BITS - start_bit;
 
         if available_bits >= T::NUM_BITS {
-            Some((self.buf[buf_index] >> start_bit) & (T::MAX as u32))
+            Some((self.buf[buf_index] >> start_bit) & T::MAX)
         } else {
             // Value spans 2 buffer cells.
             let lo = self.buf[buf_index] >> start_bit;
             let hi = self.buf[buf_index + 1] << (Self::U32_NUM_BITS - start_bit);
 
-            Some(lo ^ ((lo ^ hi) & ((T::MAX as u32) >> available_bits << available_bits)))
+            Some(lo ^ ((lo ^ hi) & (T::MAX >> available_bits << available_bits)))
         }
     }
 
     pub fn push(&mut self, value: u32) {
-        if value as usize > T::MAX {
+        if value > T::MAX {
             panic!("value is outside the range 0..={}", T::MAX);
         }
 
@@ -201,37 +201,37 @@ mod tests {
 
     #[test]
     fn max() {
-        assert_eq!(U1::MAX, 2_usize.pow(1) - 1);
-        assert_eq!(U2::MAX, 2_usize.pow(2) - 1);
-        assert_eq!(U3::MAX, 2_usize.pow(3) - 1);
-        assert_eq!(U4::MAX, 2_usize.pow(4) - 1);
-        assert_eq!(U5::MAX, 2_usize.pow(5) - 1);
-        assert_eq!(U6::MAX, 2_usize.pow(6) - 1);
-        assert_eq!(U7::MAX, 2_usize.pow(7) - 1);
-        assert_eq!(U8::MAX, 2_usize.pow(8) - 1);
-        assert_eq!(U9::MAX, 2_usize.pow(9) - 1);
-        assert_eq!(U10::MAX, 2_usize.pow(10) - 1);
-        assert_eq!(U11::MAX, 2_usize.pow(11) - 1);
-        assert_eq!(U12::MAX, 2_usize.pow(12) - 1);
-        assert_eq!(U13::MAX, 2_usize.pow(13) - 1);
-        assert_eq!(U14::MAX, 2_usize.pow(14) - 1);
-        assert_eq!(U15::MAX, 2_usize.pow(15) - 1);
-        assert_eq!(U16::MAX, 2_usize.pow(16) - 1);
-        assert_eq!(U17::MAX, 2_usize.pow(17) - 1);
-        assert_eq!(U18::MAX, 2_usize.pow(18) - 1);
-        assert_eq!(U19::MAX, 2_usize.pow(19) - 1);
-        assert_eq!(U20::MAX, 2_usize.pow(20) - 1);
-        assert_eq!(U21::MAX, 2_usize.pow(21) - 1);
-        assert_eq!(U22::MAX, 2_usize.pow(22) - 1);
-        assert_eq!(U23::MAX, 2_usize.pow(23) - 1);
-        assert_eq!(U24::MAX, 2_usize.pow(24) - 1);
-        assert_eq!(U25::MAX, 2_usize.pow(25) - 1);
-        assert_eq!(U26::MAX, 2_usize.pow(26) - 1);
-        assert_eq!(U27::MAX, 2_usize.pow(27) - 1);
-        assert_eq!(U28::MAX, 2_usize.pow(28) - 1);
-        assert_eq!(U29::MAX, 2_usize.pow(29) - 1);
-        assert_eq!(U30::MAX, 2_usize.pow(30) - 1);
-        assert_eq!(U31::MAX, 2_usize.pow(31) - 1);
+        assert_eq!(U1::MAX, 2u32.pow(1) - 1);
+        assert_eq!(U2::MAX, 2u32.pow(2) - 1);
+        assert_eq!(U3::MAX, 2u32.pow(3) - 1);
+        assert_eq!(U4::MAX, 2u32.pow(4) - 1);
+        assert_eq!(U5::MAX, 2u32.pow(5) - 1);
+        assert_eq!(U6::MAX, 2u32.pow(6) - 1);
+        assert_eq!(U7::MAX, 2u32.pow(7) - 1);
+        assert_eq!(U8::MAX, 2u32.pow(8) - 1);
+        assert_eq!(U9::MAX, 2u32.pow(9) - 1);
+        assert_eq!(U10::MAX, 2u32.pow(10) - 1);
+        assert_eq!(U11::MAX, 2u32.pow(11) - 1);
+        assert_eq!(U12::MAX, 2u32.pow(12) - 1);
+        assert_eq!(U13::MAX, 2u32.pow(13) - 1);
+        assert_eq!(U14::MAX, 2u32.pow(14) - 1);
+        assert_eq!(U15::MAX, 2u32.pow(15) - 1);
+        assert_eq!(U16::MAX, 2u32.pow(16) - 1);
+        assert_eq!(U17::MAX, 2u32.pow(17) - 1);
+        assert_eq!(U18::MAX, 2u32.pow(18) - 1);
+        assert_eq!(U19::MAX, 2u32.pow(19) - 1);
+        assert_eq!(U20::MAX, 2u32.pow(20) - 1);
+        assert_eq!(U21::MAX, 2u32.pow(21) - 1);
+        assert_eq!(U22::MAX, 2u32.pow(22) - 1);
+        assert_eq!(U23::MAX, 2u32.pow(23) - 1);
+        assert_eq!(U24::MAX, 2u32.pow(24) - 1);
+        assert_eq!(U25::MAX, 2u32.pow(25) - 1);
+        assert_eq!(U26::MAX, 2u32.pow(26) - 1);
+        assert_eq!(U27::MAX, 2u32.pow(27) - 1);
+        assert_eq!(U28::MAX, 2u32.pow(28) - 1);
+        assert_eq!(U29::MAX, 2u32.pow(29) - 1);
+        assert_eq!(U30::MAX, 2u32.pow(30) - 1);
+        assert_eq!(U31::MAX, 2u32.pow(31) - 1);
     }
 
     #[test]
