@@ -148,6 +148,26 @@ impl<T: PackedElement> PackedVec<T> {
         }
     }
 
+    pub fn get(&self, index: usize) -> Option<u32> {
+        if index >= self.len {
+            return None;
+        }
+
+        let buf_index = index * T::NUM_BITS / Self::U32_NUM_BITS;
+        let start_bit = index * T::NUM_BITS % Self::U32_NUM_BITS;
+        let available_bits = Self::U32_NUM_BITS - start_bit;
+
+        if available_bits >= T::NUM_BITS {
+            Some((self.buf[buf_index] >> start_bit) & (T::MAX as u32))
+        } else {
+            // Value spans 2 buffer cells.
+            let lo = self.buf[buf_index] >> start_bit;
+            let hi = self.buf[buf_index + 1] << (Self::U32_NUM_BITS - start_bit);
+
+            Some(lo ^ ((lo ^ hi) & ((T::MAX as u32) >> available_bits << available_bits)))
+        }
+    }
+
     pub fn push(&mut self, value: u32) {
         if value as usize > T::MAX {
             panic!("value is outside the range 0..={}", T::MAX);
@@ -250,5 +270,39 @@ mod tests {
 
         v.push(4);
         assert_eq!(v.buf.len(), 2);
+    }
+
+    #[test]
+    fn get_no_span() {
+        let v1 = vec![251, 252, 253, 254, 255];
+
+        let mut v2 = PackedVec::<U8>::new();
+        for x in &v1 {
+            v2.push(*x);
+        }
+
+        assert_eq!(v2.len, v1.len());
+        assert_eq!(v2.get(0).unwrap(), v1[0]);
+        assert_eq!(v2.get(1).unwrap(), v1[1]);
+        assert_eq!(v2.get(2).unwrap(), v1[2]);
+        assert_eq!(v2.get(3).unwrap(), v1[3]);
+        assert_eq!(v2.get(4).unwrap(), v1[4]);
+    }
+
+    #[test]
+    fn get_has_span() {
+        let v1 = vec![507, 508, 509, 510, 511];
+
+        let mut v2 = PackedVec::<U9>::new();
+        for x in &v1 {
+            v2.push(*x);
+        }
+
+        assert_eq!(v2.len, v1.len());
+        assert_eq!(v2.get(0).unwrap(), v1[0]);
+        assert_eq!(v2.get(1).unwrap(), v1[1]);
+        assert_eq!(v2.get(2).unwrap(), v1[2]);
+        assert_eq!(v2.get(3).unwrap(), v1[3]);
+        assert_eq!(v2.get(4).unwrap(), v1[4]);
     }
 }
