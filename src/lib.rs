@@ -168,6 +168,10 @@ impl<T: PackedElement> PackedVec<T> {
         }
     }
 
+    pub fn iter(&self) -> PackedVecIterator<'_, T> {
+        self.into_iter()
+    }
+
     pub fn len(&self) -> usize {
         self.len
     }
@@ -196,6 +200,62 @@ impl<T: PackedElement> PackedVec<T> {
         }
 
         self.len += 1;
+    }
+}
+
+pub struct PackedVecIntoIterator<T: PackedElement> {
+    vec: PackedVec<T>,
+    index: usize,
+}
+
+impl<T: PackedElement> IntoIterator for PackedVec<T> {
+    type Item = u32;
+    type IntoIter = PackedVecIntoIterator<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        PackedVecIntoIterator {
+            vec: self,
+            index: 0,
+        }
+    }
+}
+
+impl<T: PackedElement> Iterator for PackedVecIntoIterator<T> {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.vec.get(self.index);
+        self.index += 1;
+
+        result
+    }
+}
+
+pub struct PackedVecIterator<'a, T: PackedElement> {
+    vec: &'a PackedVec<T>,
+    index: usize,
+}
+
+impl<'a, T: PackedElement> IntoIterator for &'a PackedVec<T> {
+    type Item = u32;
+    type IntoIter = PackedVecIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        PackedVecIterator {
+            vec: self,
+            index: 0,
+        }
+    }
+}
+
+impl<'a, T: PackedElement> Iterator for PackedVecIterator<'a, T> {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let result = self.vec.get(self.index);
+        self.index += 1;
+
+        result
     }
 }
 
@@ -308,5 +368,68 @@ mod tests {
         assert_eq!(v2.get(2).unwrap(), v1[2]);
         assert_eq!(v2.get(3).unwrap(), v1[3]);
         assert_eq!(v2.get(4).unwrap(), v1[4]);
+    }
+
+    #[test]
+    fn into_iter_move() {
+        let v1 = vec![251, 252, 253, 254, 255];
+
+        let mut v2 = PackedVec::<U8>::new();
+        for x in &v1 {
+            v2.push(*x);
+        }
+
+        let mut iter = v2.into_iter();
+        assert_eq!(iter.next().unwrap(), v1[0]);
+        assert_eq!(iter.next().unwrap(), v1[1]);
+        assert_eq!(iter.next().unwrap(), v1[2]);
+        assert_eq!(iter.next().unwrap(), v1[3]);
+        assert_eq!(iter.next().unwrap(), v1[4]);
+        assert_eq!(iter.next(), None);
+
+        // Moved. Compile error:
+        // v2.push(250);
+    }
+
+    #[test]
+    fn into_iter_ref() {
+        let v1 = vec![507, 508, 509, 510, 511];
+
+        let mut v2 = PackedVec::<U9>::new();
+        for x in &v1 {
+            v2.push(*x);
+        }
+
+        let mut iter = (&v2).into_iter();
+        assert_eq!(iter.next().unwrap(), v1[0]);
+        assert_eq!(iter.next().unwrap(), v1[1]);
+        assert_eq!(iter.next().unwrap(), v1[2]);
+        assert_eq!(iter.next().unwrap(), v1[3]);
+        assert_eq!(iter.next().unwrap(), v1[4]);
+        assert_eq!(iter.next(), None);
+
+        // Ok:
+        // v2.push(506);
+    }
+
+    #[test]
+    fn iter() {
+        let v1 = vec![507, 508, 509, 510, 511];
+
+        let mut v2 = PackedVec::<U9>::new();
+        for x in &v1 {
+            v2.push(*x);
+        }
+
+        let mut iter = v2.iter();
+        assert_eq!(iter.next().unwrap(), v1[0]);
+        assert_eq!(iter.next().unwrap(), v1[1]);
+        assert_eq!(iter.next().unwrap(), v1[2]);
+        assert_eq!(iter.next().unwrap(), v1[3]);
+        assert_eq!(iter.next().unwrap(), v1[4]);
+        assert_eq!(iter.next(), None);
+
+        // Ok:
+        // v2.push(506);
     }
 }
