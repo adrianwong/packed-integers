@@ -1,29 +1,29 @@
 use std::marker::PhantomData;
 
-pub mod packed_element;
-pub use crate::packed_element::*;
+pub mod packed_int;
+pub use crate::packed_int::*;
 
-pub struct PackedVec<T: PackedElement> {
+pub struct PackedIntegers<T: PackedInt> {
     buf: Vec<u32>,
     len: usize,
     phantom: PhantomData<T>,
 }
 
-impl<T: PackedElement> PackedVec<T> {
+impl<T: PackedInt> PackedIntegers<T> {
     const U32_NUM_BITS: usize = 32;
 
-    pub fn new() -> PackedVec<T> {
-        PackedVec {
+    pub fn new() -> PackedIntegers<T> {
+        PackedIntegers {
             buf: Vec::new(),
             len: 0,
             phantom: PhantomData,
         }
     }
 
-    pub fn with_capacity(capacity: usize) -> PackedVec<T> {
+    pub fn with_capacity(capacity: usize) -> PackedIntegers<T> {
         let capacity = (T::NUM_BITS * capacity + (Self::U32_NUM_BITS - 1)) / Self::U32_NUM_BITS;
 
-        PackedVec {
+        PackedIntegers {
             buf: Vec::with_capacity(capacity),
             len: 0,
             phantom: PhantomData,
@@ -54,7 +54,7 @@ impl<T: PackedElement> PackedVec<T> {
         }
     }
 
-    pub fn iter(&self) -> PackedVecIterator<'_, T> {
+    pub fn iter(&self) -> PackedIntegersIterator<'_, T> {
         self.into_iter()
     }
 
@@ -89,24 +89,24 @@ impl<T: PackedElement> PackedVec<T> {
     }
 }
 
-pub struct PackedVecIntoIterator<T: PackedElement> {
-    vec: PackedVec<T>,
+pub struct PackedIntegersIntoIterator<T: PackedInt> {
+    vec: PackedIntegers<T>,
     index: usize,
 }
 
-impl<T: PackedElement> IntoIterator for PackedVec<T> {
+impl<T: PackedInt> IntoIterator for PackedIntegers<T> {
     type Item = u32;
-    type IntoIter = PackedVecIntoIterator<T>;
+    type IntoIter = PackedIntegersIntoIterator<T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        PackedVecIntoIterator {
+        PackedIntegersIntoIterator {
             vec: self,
             index: 0,
         }
     }
 }
 
-impl<T: PackedElement> Iterator for PackedVecIntoIterator<T> {
+impl<T: PackedInt> Iterator for PackedIntegersIntoIterator<T> {
     type Item = u32;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -117,24 +117,24 @@ impl<T: PackedElement> Iterator for PackedVecIntoIterator<T> {
     }
 }
 
-pub struct PackedVecIterator<'a, T: PackedElement> {
-    vec: &'a PackedVec<T>,
+pub struct PackedIntegersIterator<'a, T: PackedInt> {
+    vec: &'a PackedIntegers<T>,
     index: usize,
 }
 
-impl<'a, T: PackedElement> IntoIterator for &'a PackedVec<T> {
+impl<'a, T: PackedInt> IntoIterator for &'a PackedIntegers<T> {
     type Item = u32;
-    type IntoIter = PackedVecIterator<'a, T>;
+    type IntoIter = PackedIntegersIterator<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        PackedVecIterator {
+        PackedIntegersIterator {
             vec: self,
             index: 0,
         }
     }
 }
 
-impl<'a, T: PackedElement> Iterator for PackedVecIterator<'a, T> {
+impl<'a, T: PackedInt> Iterator for PackedIntegersIterator<'a, T> {
     type Item = u32;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn buflen_no_span() {
-        let mut v = PackedVec::<U8>::new();
+        let mut v = PackedIntegers::<U8>::new();
         v.push(1);
         v.push(2);
         v.push(3);
@@ -164,7 +164,7 @@ mod tests {
 
     #[test]
     fn buflen_has_span() {
-        let mut v = PackedVec::<U9>::new();
+        let mut v = PackedIntegers::<U9>::new();
         v.push(1);
         v.push(2);
         v.push(3);
@@ -176,11 +176,11 @@ mod tests {
 
     #[test]
     fn capacity() {
-        let v1 = PackedVec::<U9>::with_capacity(7);
+        let v1 = PackedIntegers::<U9>::with_capacity(7);
         assert_eq!(v1.buf.capacity(), 2);
         assert_eq!(v1.capacity(), 7);
 
-        let v2 = PackedVec::<U9>::with_capacity(8);
+        let v2 = PackedIntegers::<U9>::with_capacity(8);
         assert_eq!(v2.buf.capacity(), 3);
         assert_eq!(v2.capacity(), 10);
     }

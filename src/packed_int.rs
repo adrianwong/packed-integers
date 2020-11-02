@@ -30,101 +30,101 @@ pub enum U29 {}
 pub enum U30 {}
 pub enum U31 {}
 
-pub trait PackedElement {
+pub trait PackedInt {
     const NUM_BITS: usize;
     const MAX: u32 = (1 << Self::NUM_BITS) - 1;
 }
 
-impl PackedElement for U1 {
+impl PackedInt for U1 {
     const NUM_BITS: usize = 1;
 }
-impl PackedElement for U2 {
+impl PackedInt for U2 {
     const NUM_BITS: usize = 2;
 }
-impl PackedElement for U3 {
+impl PackedInt for U3 {
     const NUM_BITS: usize = 3;
 }
-impl PackedElement for U4 {
+impl PackedInt for U4 {
     const NUM_BITS: usize = 4;
 }
-impl PackedElement for U5 {
+impl PackedInt for U5 {
     const NUM_BITS: usize = 5;
 }
-impl PackedElement for U6 {
+impl PackedInt for U6 {
     const NUM_BITS: usize = 6;
 }
-impl PackedElement for U7 {
+impl PackedInt for U7 {
     const NUM_BITS: usize = 7;
 }
-impl PackedElement for U8 {
+impl PackedInt for U8 {
     const NUM_BITS: usize = 8;
 }
-impl PackedElement for U9 {
+impl PackedInt for U9 {
     const NUM_BITS: usize = 9;
 }
-impl PackedElement for U10 {
+impl PackedInt for U10 {
     const NUM_BITS: usize = 10;
 }
-impl PackedElement for U11 {
+impl PackedInt for U11 {
     const NUM_BITS: usize = 11;
 }
-impl PackedElement for U12 {
+impl PackedInt for U12 {
     const NUM_BITS: usize = 12;
 }
-impl PackedElement for U13 {
+impl PackedInt for U13 {
     const NUM_BITS: usize = 13;
 }
-impl PackedElement for U14 {
+impl PackedInt for U14 {
     const NUM_BITS: usize = 14;
 }
-impl PackedElement for U15 {
+impl PackedInt for U15 {
     const NUM_BITS: usize = 15;
 }
-impl PackedElement for U16 {
+impl PackedInt for U16 {
     const NUM_BITS: usize = 16;
 }
-impl PackedElement for U17 {
+impl PackedInt for U17 {
     const NUM_BITS: usize = 17;
 }
-impl PackedElement for U18 {
+impl PackedInt for U18 {
     const NUM_BITS: usize = 18;
 }
-impl PackedElement for U19 {
+impl PackedInt for U19 {
     const NUM_BITS: usize = 19;
 }
-impl PackedElement for U20 {
+impl PackedInt for U20 {
     const NUM_BITS: usize = 20;
 }
-impl PackedElement for U21 {
+impl PackedInt for U21 {
     const NUM_BITS: usize = 21;
 }
-impl PackedElement for U22 {
+impl PackedInt for U22 {
     const NUM_BITS: usize = 22;
 }
-impl PackedElement for U23 {
+impl PackedInt for U23 {
     const NUM_BITS: usize = 23;
 }
-impl PackedElement for U24 {
+impl PackedInt for U24 {
     const NUM_BITS: usize = 24;
 }
-impl PackedElement for U25 {
+impl PackedInt for U25 {
     const NUM_BITS: usize = 25;
 }
-impl PackedElement for U26 {
+impl PackedInt for U26 {
     const NUM_BITS: usize = 26;
 }
-impl PackedElement for U27 {
+impl PackedInt for U27 {
     const NUM_BITS: usize = 27;
 }
-impl PackedElement for U28 {
+impl PackedInt for U28 {
     const NUM_BITS: usize = 28;
 }
-impl PackedElement for U29 {
+impl PackedInt for U29 {
     const NUM_BITS: usize = 29;
 }
-impl PackedElement for U30 {
+impl PackedInt for U30 {
     const NUM_BITS: usize = 30;
 }
-impl PackedElement for U31 {
+impl PackedInt for U31 {
     const NUM_BITS: usize = 31;
 }

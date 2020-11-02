@@ -1,15 +1,15 @@
-use packed_vec::*;
+use packed_integers::*;
 
 #[test]
 fn push_eq_max() {
-    let mut v = PackedVec::<U10>::new();
+    let mut v = PackedIntegers::<U10>::new();
     v.push(1023);
 }
 
 #[test]
 #[should_panic]
 fn push_gt_max() {
-    let mut v = PackedVec::<U10>::new();
+    let mut v = PackedIntegers::<U10>::new();
     v.push(1024);
 }
 
@@ -17,7 +17,7 @@ fn push_gt_max() {
 fn get_no_span() {
     let v1 = vec![251, 252, 253, 254, 255];
 
-    let mut v2 = PackedVec::<U8>::new();
+    let mut v2 = PackedIntegers::<U8>::new();
     for x in &v1 {
         v2.push(*x);
     }
@@ -34,7 +34,7 @@ fn get_no_span() {
 fn get_has_span() {
     let v1 = vec![507, 508, 509, 510, 511];
 
-    let mut v2 = PackedVec::<U9>::new();
+    let mut v2 = PackedIntegers::<U9>::new();
     for x in &v1 {
         v2.push(*x);
     }
@@ -51,7 +51,7 @@ fn get_has_span() {
 fn into_iter_move() {
     let v1 = vec![251, 252, 253, 254, 255];
 
-    let mut v2 = PackedVec::<U8>::new();
+    let mut v2 = PackedIntegers::<U8>::new();
     for x in &v1 {
         v2.push(*x);
     }
@@ -72,7 +72,7 @@ fn into_iter_move() {
 fn into_iter_ref() {
     let v1 = vec![507, 508, 509, 510, 511];
 
-    let mut v2 = PackedVec::<U9>::new();
+    let mut v2 = PackedIntegers::<U9>::new();
     for x in &v1 {
         v2.push(*x);
     }
@@ -93,7 +93,7 @@ fn into_iter_ref() {
 fn iter() {
     let v1 = vec![507, 508, 509, 510, 511];
 
-    let mut v2 = PackedVec::<U9>::new();
+    let mut v2 = PackedIntegers::<U9>::new();
     for x in &v1 {
         v2.push(*x);
     }

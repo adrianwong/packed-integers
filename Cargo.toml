@@ -1,5 +1,5 @@
 [package]
-name = "packed-vec"
+name = "packed-integers"
 version = "0.1.0"
 authors = ["Adrian Wong <adrianwjw@gmail.com>"]
 edition = "2018"
