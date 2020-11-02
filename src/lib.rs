@@ -148,6 +148,20 @@ impl<T: PackedElement> PackedVec<T> {
         }
     }
 
+    pub fn with_capacity(capacity: usize) -> PackedVec<T> {
+        let capacity = (T::NUM_BITS * capacity + (Self::U32_NUM_BITS - 1)) / Self::U32_NUM_BITS;
+
+        PackedVec {
+            buf: Vec::with_capacity(capacity),
+            len: 0,
+            phantom: PhantomData,
+        }
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.buf.capacity() * Self::U32_NUM_BITS / T::NUM_BITS
+    }
+
     pub fn get(&self, index: usize) -> Option<u32> {
         if index >= self.len {
             return None;
@@ -286,5 +300,16 @@ mod tests {
 
         v.push(4);
         assert_eq!(v.buf.len(), 2);
+    }
+
+    #[test]
+    fn capacity() {
+        let v1 = PackedVec::<U9>::with_capacity(7);
+        assert_eq!(v1.buf.capacity(), 2);
+        assert_eq!(v1.capacity(), 7);
+
+        let v2 = PackedVec::<U9>::with_capacity(8);
+        assert_eq!(v2.buf.capacity(), 3);
+        assert_eq!(v2.capacity(), 10);
     }
 }
