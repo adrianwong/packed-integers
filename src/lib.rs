@@ -137,6 +137,24 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.len += 1;
     }
 
+    pub fn remove(&mut self, index: usize) -> u32 {
+        if index >= self.len {
+            panic!(
+                "removal index (is {}) should be < len (is {})",
+                index, self.len
+            );
+        }
+
+        let result = self.get_unchecked(index);
+
+        for i in (index + 1)..self.len {
+            self.set_unchecked(i - 1, self.get_unchecked(i));
+        }
+        self.len -= 1;
+
+        result
+    }
+
     pub fn reserve(&mut self, additional: usize) {
         if self.capacity() >= self.len + additional {
             return;

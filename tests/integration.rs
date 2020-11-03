@@ -215,6 +215,33 @@ fn push_gt_max() {
 }
 
 #[test]
+fn remove() {
+    let mut v = packed_ints![251, 252, 253, 254, 255; U8];
+    v.remove(0);
+
+    assert_eq!(v.len(), 4);
+    assert_eq!(v.get(0).unwrap(), 252);
+    assert_eq!(v.get(1).unwrap(), 253);
+    assert_eq!(v.get(2).unwrap(), 254);
+    assert_eq!(v.get(3).unwrap(), 255);
+    assert_eq!(v.get(4), None);
+
+    v.remove(2);
+    assert_eq!(v.len(), 3);
+    assert_eq!(v.get(0).unwrap(), 252);
+    assert_eq!(v.get(1).unwrap(), 253);
+    assert_eq!(v.get(2).unwrap(), 255);
+    assert_eq!(v.get(3), None);
+}
+
+#[test]
+#[should_panic]
+fn remove_eq_len() {
+    let mut v = packed_ints![251, 252; U8];
+    v.remove(2);
+}
+
+#[test]
 fn set() {
     let mut v = packed_ints![251, 252, 253, 254, 255; U8];
     v.set(0, 100);
