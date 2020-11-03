@@ -1,6 +1,15 @@
 use packed_integers::*;
 
 #[test]
+fn clear() {
+    let mut v = packed_ints![251, 252, 253, 254, 255; U8];
+    v.clear();
+
+    assert_eq!(v.len(), 0);
+    assert_eq!(v.get(0), None);
+}
+
+#[test]
 fn get_has_span() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 

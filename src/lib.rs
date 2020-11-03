@@ -34,6 +34,10 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.buf.capacity() * Self::U32_NUM_BITS / T::NUM_BITS
     }
 
+    pub fn clear(&mut self) {
+        self.truncate(0)
+    }
+
     pub fn get(&self, index: usize) -> Option<u32> {
         if index >= self.len {
             None
