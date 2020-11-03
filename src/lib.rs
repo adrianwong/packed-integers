@@ -36,21 +36,25 @@ impl<T: PackedInt> PackedIntegers<T> {
 
     pub fn get(&self, index: usize) -> Option<u32> {
         if index >= self.len {
-            return None;
+            None
+        } else {
+            Some(self.get_unchecked(index))
         }
+    }
 
+    pub fn get_unchecked(&self, index: usize) -> u32 {
         let buf_index = index * T::NUM_BITS / Self::U32_NUM_BITS;
         let start_bit = index * T::NUM_BITS % Self::U32_NUM_BITS;
         let available_bits = Self::U32_NUM_BITS - start_bit;
 
         if available_bits >= T::NUM_BITS {
-            Some((self.buf[buf_index] >> start_bit) & T::MAX)
+            (self.buf[buf_index] >> start_bit) & T::MAX
         } else {
             // Value spans 2 buffer cells.
             let lo = self.buf[buf_index] >> start_bit;
             let hi = self.buf[buf_index + 1] << (Self::U32_NUM_BITS - start_bit);
 
-            Some(lo ^ ((lo ^ hi) & (T::MAX >> available_bits << available_bits)))
+            lo ^ ((lo ^ hi) & (T::MAX >> available_bits << available_bits))
         }
     }
 

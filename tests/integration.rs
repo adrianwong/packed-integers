@@ -48,6 +48,29 @@ fn get_has_span() {
 }
 
 #[test]
+#[should_panic]
+fn get_unchecked() {
+    let v1 = vec![251, 252, 253, 254, 255];
+
+    let mut v2 = PackedIntegers::<U8>::new();
+    for x in &v1 {
+        v2.push(*x);
+    }
+
+    assert_eq!(v2.get_unchecked(0), v1[0]);
+    assert_eq!(v2.get_unchecked(1), v1[1]);
+    assert_eq!(v2.get_unchecked(2), v1[2]);
+    assert_eq!(v2.get_unchecked(3), v1[3]);
+    assert_eq!(v2.get_unchecked(4), v1[4]);
+
+    // UB if index >= len.
+    assert_eq!(v2.get_unchecked(5), 0);
+    assert_eq!(v2.get_unchecked(6), 0);
+    assert_eq!(v2.get_unchecked(7), 0);
+    v2.get_unchecked(8);
+}
+
+#[test]
 fn into_iter_move() {
     let v1 = vec![251, 252, 253, 254, 255];
 
