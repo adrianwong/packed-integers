@@ -63,6 +63,54 @@ fn get_no_span() {
 }
 
 #[test]
+fn insert() {
+    let mut v = packed_ints![1, 2, 3; U8];
+    v.insert(0, 4);
+
+    assert_eq!(v.len(), 4);
+    assert_eq!(v.get(0).unwrap(), 4);
+    assert_eq!(v.get(1).unwrap(), 1);
+    assert_eq!(v.get(2).unwrap(), 2);
+    assert_eq!(v.get(3).unwrap(), 3);
+    assert_eq!(v.get(4), None);
+
+    v.insert(2, 5);
+    assert_eq!(v.len(), 5);
+    assert_eq!(v.get(0).unwrap(), 4);
+    assert_eq!(v.get(1).unwrap(), 1);
+    assert_eq!(v.get(2).unwrap(), 5);
+    assert_eq!(v.get(3).unwrap(), 2);
+    assert_eq!(v.get(4).unwrap(), 3);
+    assert_eq!(v.get(5), None);
+}
+
+#[test]
+fn insert_empty() {
+    let mut v = packed_ints![; U8];
+    v.insert(0, 4);
+
+    assert_eq!(v.len(), 1);
+    assert_eq!(v.get(0).unwrap(), 4);
+}
+
+#[test]
+fn insert_eq_len() {
+    let mut v = packed_ints![1; U8];
+    v.insert(1, 4);
+
+    assert_eq!(v.len(), 2);
+    assert_eq!(v.get(0).unwrap(), 1);
+    assert_eq!(v.get(1).unwrap(), 4);
+}
+
+#[test]
+#[should_panic]
+fn insert_gt_len() {
+    let mut v = packed_ints![1; U8];
+    v.insert(2, 4);
+}
+
+#[test]
 fn into_iter_move() {
     let v = packed_ints![251, 252, 253, 254, 255; U8];
 

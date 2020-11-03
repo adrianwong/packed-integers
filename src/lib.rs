@@ -71,6 +71,21 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    pub fn insert(&mut self, index: usize, value: u32) {
+        if index > self.len {
+            panic!(
+                "insertion index (is {}) should be <= len (is {})",
+                index, self.len
+            );
+        }
+
+        self.push(value);
+        for i in ((index + 1)..self.len).rev() {
+            self.set_unchecked(i, self.get_unchecked(i - 1))
+        }
+        self.set_unchecked(index, value);
+    }
+
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
