@@ -132,3 +132,41 @@ fn push_gt_max() {
     let mut v = PackedIntegers::<U10>::new();
     v.push(1024);
 }
+
+#[test]
+fn set() {
+    let v1 = vec![251, 252, 253, 254, 255];
+
+    let mut v2 = PackedIntegers::<U8>::new();
+    for x in &v1 {
+        v2.push(*x);
+    }
+    v2.set(0, 100);
+    v2.set(2, 150);
+    v2.set(4, 200);
+
+    assert_eq!(v2.get(0).unwrap(), 100);
+    assert_eq!(v2.get(1).unwrap(), v1[1]);
+    assert_eq!(v2.get(2).unwrap(), 150);
+    assert_eq!(v2.get(3).unwrap(), v1[3]);
+    assert_eq!(v2.get(4).unwrap(), 200);
+}
+
+#[test]
+#[should_panic]
+fn set_oob() {
+    let mut v = PackedIntegers::<U8>::new();
+    v.push(100);
+    v.set(1, 200);
+}
+
+#[test]
+#[should_panic]
+fn set_unchecked() {
+    let mut v = PackedIntegers::<U8>::new();
+    v.push(100);
+    v.set_unchecked(1, 101); // Fine.
+    v.set_unchecked(2, 102); // Fine.
+    v.set_unchecked(3, 103); // Fine.
+    v.set_unchecked(4, 104); // Panics.
+}

@@ -91,6 +91,39 @@ impl<T: PackedInt> PackedIntegers<T> {
 
         self.len += 1;
     }
+
+    pub fn set(&mut self, index: usize, value: u32) {
+        if index >= self.len {
+            panic!(
+                "index out of bounds: the len is {} but the index is {}",
+                self.len, index
+            );
+        } else {
+            self.set_unchecked(index, value);
+        }
+    }
+
+    pub fn set_unchecked(&mut self, index: usize, value: u32) {
+        if value > T::MAX {
+            panic!("value is outside the range 0..={}", T::MAX);
+        }
+
+        let buf_index = index * T::NUM_BITS / Self::U32_NUM_BITS;
+        let start_bit = index * T::NUM_BITS % Self::U32_NUM_BITS;
+        let available_bits = Self::U32_NUM_BITS - start_bit;
+
+        if available_bits >= T::NUM_BITS {
+            self.buf[buf_index] &= !(T::MAX << start_bit);
+            self.buf[buf_index] |= value << start_bit;
+        } else {
+            // Value spans 2 buffer cells.
+            self.buf[buf_index] &= !(T::MAX << start_bit);
+            self.buf[buf_index] |= value << start_bit;
+
+            self.buf[buf_index + 1] = !(T::MAX >> (Self::U32_NUM_BITS - start_bit));
+            self.buf[buf_index + 1] |= value >> available_bits;
+        }
+    }
 }
 
 pub struct PackedIntegersIntoIterator<T: PackedInt> {
