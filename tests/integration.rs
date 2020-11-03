@@ -77,6 +77,15 @@ fn into_iter_ref() {
 }
 
 #[test]
+fn is_empty() {
+    let mut v = packed_ints![; U31];
+    assert!(v.is_empty());
+
+    v.push(12345);
+    assert!(!v.is_empty());
+}
+
+#[test]
 fn iter() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 

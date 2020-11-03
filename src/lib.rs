@@ -58,6 +58,10 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
     pub fn iter(&self) -> PackedIntegersIterator<'_, T> {
         self.into_iter()
     }
