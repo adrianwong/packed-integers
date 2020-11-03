@@ -43,9 +43,9 @@ impl<T: PackedInt> PackedIntegers<T> {
     }
 
     pub fn get_unchecked(&self, index: usize) -> u32 {
-        let buf_index = index * T::NUM_BITS / Self::U32_NUM_BITS;
-        let start_bit = index * T::NUM_BITS % Self::U32_NUM_BITS;
-        let available_bits = Self::U32_NUM_BITS - start_bit;
+        let buf_index = Self::buf_index(index);
+        let start_bit = Self::start_bit(index);
+        let available_bits = Self::available_bits(start_bit);
 
         if available_bits >= T::NUM_BITS {
             (self.buf[buf_index] >> start_bit) & T::MAX
@@ -80,9 +80,9 @@ impl<T: PackedInt> PackedIntegers<T> {
             panic!("value is outside the range 0..={}", T::MAX);
         }
 
-        let buf_index = self.len * T::NUM_BITS / Self::U32_NUM_BITS;
-        let start_bit = self.len * T::NUM_BITS % Self::U32_NUM_BITS;
-        let available_bits = Self::U32_NUM_BITS - start_bit;
+        let buf_index = Self::buf_index(self.len);
+        let start_bit = Self::start_bit(self.len);
+        let available_bits = Self::available_bits(start_bit);
 
         if available_bits >= T::NUM_BITS {
             if buf_index == self.buf.len() {
@@ -121,9 +121,9 @@ impl<T: PackedInt> PackedIntegers<T> {
             panic!("value is outside the range 0..={}", T::MAX);
         }
 
-        let buf_index = index * T::NUM_BITS / Self::U32_NUM_BITS;
-        let start_bit = index * T::NUM_BITS % Self::U32_NUM_BITS;
-        let available_bits = Self::U32_NUM_BITS - start_bit;
+        let buf_index = Self::buf_index(index);
+        let start_bit = Self::start_bit(index);
+        let available_bits = Self::available_bits(start_bit);
 
         if available_bits >= T::NUM_BITS {
             self.buf[buf_index] &= !(T::MAX << start_bit);
@@ -136,6 +136,21 @@ impl<T: PackedInt> PackedIntegers<T> {
             self.buf[buf_index + 1] = !(T::MAX >> (Self::U32_NUM_BITS - start_bit));
             self.buf[buf_index + 1] |= value >> available_bits;
         }
+    }
+
+    #[inline]
+    fn available_bits(start_bit: usize) -> usize {
+        Self::U32_NUM_BITS - start_bit
+    }
+
+    #[inline]
+    fn buf_index(index: usize) -> usize {
+        index * T::NUM_BITS / Self::U32_NUM_BITS
+    }
+
+    #[inline]
+    fn start_bit(index: usize) -> usize {
+        index * T::NUM_BITS % Self::U32_NUM_BITS
     }
 }
 
