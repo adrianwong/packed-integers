@@ -154,6 +154,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn buflen_has_span() {
+        let mut v = PackedIntegers::<U9>::new();
+        v.push(1);
+        v.push(2);
+        v.push(3);
+        assert_eq!(v.buf.len(), 1);
+
+        v.push(4);
+        assert_eq!(v.buf.len(), 2);
+    }
+
+    #[test]
     fn buflen_no_span() {
         let mut v = PackedIntegers::<U8>::new();
         v.push(1);
@@ -163,18 +175,6 @@ mod tests {
         assert_eq!(v.buf.len(), 1);
 
         v.push(5);
-        assert_eq!(v.buf.len(), 2);
-    }
-
-    #[test]
-    fn buflen_has_span() {
-        let mut v = PackedIntegers::<U9>::new();
-        v.push(1);
-        v.push(2);
-        v.push(3);
-        assert_eq!(v.buf.len(), 1);
-
-        v.push(4);
         assert_eq!(v.buf.len(), 2);
     }
 

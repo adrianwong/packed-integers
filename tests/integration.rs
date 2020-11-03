@@ -1,23 +1,10 @@
 use packed_integers::*;
 
 #[test]
-fn push_eq_max() {
-    let mut v = PackedIntegers::<U10>::new();
-    v.push(1023);
-}
+fn get_has_span() {
+    let v1 = vec![507, 508, 509, 510, 511];
 
-#[test]
-#[should_panic]
-fn push_gt_max() {
-    let mut v = PackedIntegers::<U10>::new();
-    v.push(1024);
-}
-
-#[test]
-fn get_no_span() {
-    let v1 = vec![251, 252, 253, 254, 255];
-
-    let mut v2 = PackedIntegers::<U8>::new();
+    let mut v2 = PackedIntegers::<U9>::new();
     for x in &v1 {
         v2.push(*x);
     }
@@ -31,10 +18,10 @@ fn get_no_span() {
 }
 
 #[test]
-fn get_has_span() {
-    let v1 = vec![507, 508, 509, 510, 511];
+fn get_no_span() {
+    let v1 = vec![251, 252, 253, 254, 255];
 
-    let mut v2 = PackedIntegers::<U9>::new();
+    let mut v2 = PackedIntegers::<U8>::new();
     for x in &v1 {
         v2.push(*x);
     }
@@ -64,10 +51,10 @@ fn get_unchecked() {
     assert_eq!(v2.get_unchecked(4), v1[4]);
 
     // UB if index >= len.
-    assert_eq!(v2.get_unchecked(5), 0);
-    assert_eq!(v2.get_unchecked(6), 0);
-    assert_eq!(v2.get_unchecked(7), 0);
-    v2.get_unchecked(8);
+    assert_eq!(v2.get_unchecked(5), 0); // Fine.
+    assert_eq!(v2.get_unchecked(6), 0); // Fine.
+    assert_eq!(v2.get_unchecked(7), 0); // Fine.
+    v2.get_unchecked(8); // Panics.
 }
 
 #[test]
@@ -131,4 +118,17 @@ fn iter() {
 
     // Ok:
     // v2.push(506);
+}
+
+#[test]
+fn push_eq_max() {
+    let mut v = PackedIntegers::<U10>::new();
+    v.push(1023);
+}
+
+#[test]
+#[should_panic]
+fn push_gt_max() {
+    let mut v = PackedIntegers::<U10>::new();
+    v.push(1024);
 }
