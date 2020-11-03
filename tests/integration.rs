@@ -179,3 +179,35 @@ fn set_unchecked() {
     v.set_unchecked(3, 103); // Fine.
     v.set_unchecked(4, 104); // Panics.
 }
+
+#[test]
+fn truncate() {
+    let mut v = packed_ints![251, 252, 253, 254, 255; U8];
+    v.truncate(2);
+
+    assert_eq!(v.len(), 2);
+    assert_eq!(v.get(0).unwrap(), 251);
+    assert_eq!(v.get(1).unwrap(), 252);
+    assert_eq!(v.get(2), None);
+
+    v.push(200);
+    assert_eq!(v.len(), 3);
+    assert_eq!(v.get(0).unwrap(), 251);
+    assert_eq!(v.get(1).unwrap(), 252);
+    assert_eq!(v.get(2).unwrap(), 200);
+    assert_eq!(v.get(3), None);
+}
+
+#[test]
+fn truncate_gt() {
+    let mut v = packed_ints![251, 252, 253, 254, 255; U8];
+    v.truncate(10);
+
+    assert_eq!(v.len(), 5);
+    assert_eq!(v.get(0).unwrap(), 251);
+    assert_eq!(v.get(1).unwrap(), 252);
+    assert_eq!(v.get(2).unwrap(), 253);
+    assert_eq!(v.get(3).unwrap(), 254);
+    assert_eq!(v.get(4).unwrap(), 255);
+    assert_eq!(v.get(5), None);
+}

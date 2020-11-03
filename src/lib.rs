@@ -142,6 +142,13 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    pub fn truncate(&mut self, len: usize) {
+        if len > self.len {
+            return;
+        }
+        self.len = len;
+    }
+
     #[inline]
     fn available_bits(start_bit: usize) -> usize {
         Self::U32_NUM_BITS - start_bit
