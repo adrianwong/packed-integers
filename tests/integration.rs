@@ -63,24 +63,6 @@ fn get_no_span() {
 }
 
 #[test]
-#[should_panic]
-fn get_unchecked() {
-    let v = packed_ints![251, 252, 253, 254, 255; U8];
-
-    assert_eq!(v.get_unchecked(0), 251);
-    assert_eq!(v.get_unchecked(1), 252);
-    assert_eq!(v.get_unchecked(2), 253);
-    assert_eq!(v.get_unchecked(3), 254);
-    assert_eq!(v.get_unchecked(4), 255);
-
-    // UB if index >= len.
-    assert_eq!(v.get_unchecked(5), 0); // Fine.
-    assert_eq!(v.get_unchecked(6), 0); // Fine.
-    assert_eq!(v.get_unchecked(7), 0); // Fine.
-    v.get_unchecked(8); // Panics.
-}
-
-#[test]
 fn into_iter_move() {
     let v = packed_ints![251, 252, 253, 254, 255; U8];
 
@@ -203,17 +185,6 @@ fn set() {
 fn set_oob() {
     let mut v = packed_ints![100; U8];
     v.set(1, 200);
-}
-
-#[test]
-#[should_panic]
-fn set_unchecked() {
-    let mut v = packed_ints![100; U8];
-    // UB if index >= len.
-    v.set_unchecked(1, 101); // Fine.
-    v.set_unchecked(2, 102); // Fine.
-    v.set_unchecked(3, 103); // Fine.
-    v.set_unchecked(4, 104); // Panics.
 }
 
 #[test]

@@ -55,7 +55,7 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
-    pub fn get_unchecked(&self, index: usize) -> u32 {
+    fn get_unchecked(&self, index: usize) -> u32 {
         let buf_index = Self::buf_index(index);
         let start_bit = Self::start_bit(index);
         let available_bits = Self::available_bits(start_bit);
@@ -141,7 +141,7 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
-    pub fn set_unchecked(&mut self, index: usize, value: u32) {
+    fn set_unchecked(&mut self, index: usize, value: u32) {
         if value > T::MAX {
             panic!("value is outside the range 0..={}", T::MAX);
         }
@@ -315,6 +315,24 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn get_unchecked() {
+        let v = packed_ints![251, 252, 253, 254, 255; U8];
+
+        assert_eq!(v.get_unchecked(0), 251);
+        assert_eq!(v.get_unchecked(1), 252);
+        assert_eq!(v.get_unchecked(2), 253);
+        assert_eq!(v.get_unchecked(3), 254);
+        assert_eq!(v.get_unchecked(4), 255);
+
+        // UB if index >= len.
+        assert_eq!(v.get_unchecked(5), 0); // Fine.
+        assert_eq!(v.get_unchecked(6), 0); // Fine.
+        assert_eq!(v.get_unchecked(7), 0); // Fine.
+        v.get_unchecked(8); // Panics.
+    }
+
+    #[test]
     fn reserve() {
         let mut v = packed_ints![100; U8];
         v.reserve(4);
@@ -328,5 +346,16 @@ mod tests {
         v.reserve(3);
 
         assert_eq!(v.buf.capacity(), 1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn set_unchecked() {
+        let mut v = packed_ints![100; U8];
+        // UB if index >= len.
+        v.set_unchecked(1, 101); // Fine.
+        v.set_unchecked(2, 102); // Fine.
+        v.set_unchecked(3, 103); // Fine.
+        v.set_unchecked(4, 104); // Panics.
     }
 }
