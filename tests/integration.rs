@@ -121,6 +121,46 @@ fn iter() {
 }
 
 #[test]
+fn pop() {
+    let mut v = PackedIntegers::<U10>::new();
+    v.push(100);
+    v.push(200);
+    v.push(300);
+    v.push(400);
+    v.push(500);
+
+    assert_eq!(v.pop().unwrap(), 500);
+    assert_eq!(v.pop().unwrap(), 400);
+    assert_eq!(v.get(0).unwrap(), 100);
+    assert_eq!(v.get(1).unwrap(), 200);
+    assert_eq!(v.get(2).unwrap(), 300);
+    assert_eq!(v.get(3), None);
+
+    v.push(600);
+    assert_eq!(v.get(0).unwrap(), 100);
+    assert_eq!(v.get(1).unwrap(), 200);
+    assert_eq!(v.get(2).unwrap(), 300);
+    assert_eq!(v.get(3).unwrap(), 600);
+    assert_eq!(v.get(4), None);
+}
+
+#[test]
+fn pop_none() {
+    let mut v = PackedIntegers::<U10>::new();
+
+    assert_eq!(v.pop(), None);
+}
+
+#[test]
+fn pop_one() {
+    let mut v = PackedIntegers::<U10>::new();
+    v.push(100);
+
+    assert_eq!(v.pop().unwrap(), 100);
+    assert_eq!(v.pop(), None);
+}
+
+#[test]
 fn push_eq_max() {
     let mut v = PackedIntegers::<U10>::new();
     v.push(1023);

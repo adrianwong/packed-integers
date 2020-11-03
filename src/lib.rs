@@ -66,6 +66,15 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.len
     }
 
+    pub fn pop(&mut self) -> Option<u32> {
+        if self.len == 0 {
+            None
+        } else {
+            self.len -= 1;
+            Some(self.get_unchecked(self.len))
+        }
+    }
+
     pub fn push(&mut self, value: u32) {
         if value > T::MAX {
             panic!("value is outside the range 0..={}", T::MAX);
