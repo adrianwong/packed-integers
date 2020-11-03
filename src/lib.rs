@@ -210,6 +210,33 @@ impl<'a, T: PackedInt> Iterator for PackedIntegersIterator<'a, T> {
     }
 }
 
+#[doc(hidden)]
+#[macro_export]
+macro_rules! count_integers {
+    (; $type:ident) => { 0 };
+    ($head:expr; $type:ident) => { 1 };
+    ($head:expr, $($tail:expr),*; $type:ident) => {
+        1 + count_integers!($($tail),*; $type)
+    };
+}
+
+#[macro_export]
+macro_rules! packed_ints {
+    (; $type:ident) => {
+        PackedIntegers::<$type>::new()
+    };
+    ($($ints:expr),+; $type:ident) => {
+        {
+            let capacity = count_integers!($($ints),+; $type);
+            let mut is = PackedIntegers::<$type>::with_capacity(capacity);
+            $(
+                is.push($ints);
+            )*
+            is
+        }
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
