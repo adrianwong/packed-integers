@@ -30,6 +30,15 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    pub fn append(&mut self, other: &mut Self) {
+        self.reserve(other.len);
+
+        for i in other.iter() {
+            self.push(i);
+        }
+        other.clear();
+    }
+
     pub fn capacity(&self) -> usize {
         self.buf.capacity() * Self::U32_NUM_BITS / T::NUM_BITS
     }

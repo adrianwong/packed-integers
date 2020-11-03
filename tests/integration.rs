@@ -1,6 +1,33 @@
 use packed_integers::*;
 
 #[test]
+fn append() {
+    let mut v1 = packed_ints![1, 2; U9];
+    let mut v2 = packed_ints![3, 4, 5; U9];
+    v1.append(&mut v2);
+
+    assert_eq!(v1.get(0).unwrap(), 1);
+    assert_eq!(v1.get(1).unwrap(), 2);
+    assert_eq!(v1.get(2).unwrap(), 3);
+    assert_eq!(v1.get(3).unwrap(), 4);
+    assert_eq!(v1.get(4).unwrap(), 5);
+    assert_eq!(v1.get(5), None);
+    assert!(v2.is_empty());
+}
+
+#[test]
+fn append_empty() {
+    let mut v1 = packed_ints![1, 2; U8];
+    let mut v2 = packed_ints![; U8];
+    v1.append(&mut v2);
+
+    assert_eq!(v1.get(0).unwrap(), 1);
+    assert_eq!(v1.get(1).unwrap(), 2);
+    assert_eq!(v1.get(2), None);
+    assert!(v2.is_empty());
+}
+
+#[test]
 fn clear() {
     let mut v = packed_ints![251, 252, 253, 254, 255; U8];
     v.clear();
