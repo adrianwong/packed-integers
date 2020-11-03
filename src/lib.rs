@@ -21,7 +21,7 @@ impl<T: PackedInt> PackedIntegers<T> {
     }
 
     pub fn with_capacity(capacity: usize) -> PackedIntegers<T> {
-        let capacity = (T::NUM_BITS * capacity + (Self::U32_NUM_BITS - 1)) / Self::U32_NUM_BITS;
+        let capacity = Self::to_buf_capacity(capacity);
 
         PackedIntegers {
             buf: Vec::with_capacity(capacity),
@@ -113,6 +113,14 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.len += 1;
     }
 
+    pub fn reserve(&mut self, additional: usize) {
+        if self.capacity() >= self.len + additional {
+            return;
+        }
+        let additional = Self::to_buf_capacity(additional);
+        self.buf.reserve(additional);
+    }
+
     pub fn set(&mut self, index: usize, value: u32) {
         if index >= self.len {
             panic!(
@@ -166,6 +174,11 @@ impl<T: PackedInt> PackedIntegers<T> {
     #[inline]
     fn start_bit(index: usize) -> usize {
         index * T::NUM_BITS % Self::U32_NUM_BITS
+    }
+
+    #[inline]
+    fn to_buf_capacity(capacity: usize) -> usize {
+        (T::NUM_BITS * capacity + (Self::U32_NUM_BITS - 1)) / Self::U32_NUM_BITS
     }
 }
 
@@ -290,5 +303,21 @@ mod tests {
         let v2 = PackedIntegers::<U9>::with_capacity(8);
         assert_eq!(v2.buf.capacity(), 3);
         assert_eq!(v2.capacity(), 10);
+    }
+
+    #[test]
+    fn reserve() {
+        let mut v = packed_ints![100; U8];
+        v.reserve(4);
+
+        assert!(v.buf.capacity() >= 2);
+    }
+
+    #[test]
+    fn reserve_sufficient_capacity() {
+        let mut v = packed_ints![100; U8];
+        v.reserve(3);
+
+        assert_eq!(v.buf.capacity(), 1);
     }
 }
