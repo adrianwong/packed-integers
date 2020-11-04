@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-pub mod packed_int;
+mod packed_int;
 pub use crate::packed_int::*;
 
 pub struct PackedIntegers<T: PackedInt> {
