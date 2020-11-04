@@ -1,4 +1,5 @@
 use packed_integers::*;
+use std::cmp::Ordering;
 
 #[test]
 fn append() {
@@ -165,6 +166,55 @@ fn iter() {
 
     // Ok:
     // v.push(506);
+}
+
+#[test]
+fn ord_eq() {
+    let v1 = packed_ints![; U8];
+    let v2 = packed_ints![; U8];
+
+    assert_eq!(v1.cmp(&v2), Ordering::Equal);
+
+    let v3 = packed_ints![1, 2; U8];
+    let v4 = packed_ints![1, 2; U8];
+
+    assert_eq!(v3.cmp(&v4), Ordering::Equal);
+}
+
+#[test]
+fn ord_gt() {
+    let v1 = packed_ints![1, 4, 3; U8];
+    let v2 = packed_ints![1, 2, 3; U8];
+
+    assert_eq!(v1.cmp(&v2), Ordering::Greater);
+
+    let v3 = packed_ints![1, 4; U8];
+    let v4 = packed_ints![1, 2, 3; U8];
+
+    assert_eq!(v3.cmp(&v4), Ordering::Greater);
+
+    let v5 = packed_ints![1, 2, 3, 4; U8];
+    let v6 = packed_ints![1, 2, 3; U8];
+
+    assert_eq!(v5.cmp(&v6), Ordering::Greater);
+}
+
+#[test]
+fn ord_lt() {
+    let v1 = packed_ints![1, 2, 3; U8];
+    let v2 = packed_ints![1, 4, 3; U8];
+
+    assert_eq!(v1.cmp(&v2), Ordering::Less);
+
+    let v3 = packed_ints![1, 2, 3; U8];
+    let v4 = packed_ints![1, 4; U8];
+
+    assert_eq!(v3.cmp(&v4), Ordering::Less);
+
+    let v5 = packed_ints![1, 2, 3; U8];
+    let v6 = packed_ints![1, 2, 3, 4; U8];
+
+    assert_eq!(v5.cmp(&v6), Ordering::Less);
 }
 
 #[test]

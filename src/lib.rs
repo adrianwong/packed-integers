@@ -1,3 +1,4 @@
+use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 use std::marker::PhantomData;
 
 mod packed_int;
@@ -277,6 +278,42 @@ impl<'a, T: PackedInt> Iterator for PackedIntegersIterator<'a, T> {
         self.index += 1;
 
         result
+    }
+}
+
+impl<T: PackedInt> Eq for PackedIntegers<T> {}
+
+impl<T: PackedInt> PartialEq for PackedIntegers<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.len == other.len && self.cmp(other) == Ordering::Equal
+    }
+}
+
+impl<T: PackedInt> Ord for PackedIntegers<T> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let mut o_iter = other.iter();
+        for s in self {
+            let o = match o_iter.next() {
+                Some(o) => o,
+                None => return Ordering::Greater,
+            };
+
+            match s.cmp(&o) {
+                Ordering::Equal => continue,
+                cmp => return cmp,
+            }
+        }
+
+        match o_iter.next() {
+            Some(_) => Ordering::Less,
+            None => Ordering::Equal,
+        }
+    }
+}
+
+impl<T: PackedInt> PartialOrd for PackedIntegers<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
