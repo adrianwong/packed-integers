@@ -286,7 +286,7 @@ macro_rules! count_integers {
     (; $type:ident) => { 0 };
     ($head:expr; $type:ident) => { 1 };
     ($head:expr, $($tail:expr),*; $type:ident) => {
-        1 + count_integers!($($tail),*; $type)
+        1 + $crate::count_integers!($($tail),*; $type)
     };
 }
 
@@ -297,8 +297,8 @@ macro_rules! packed_ints {
     };
     ($($ints:expr),+; $type:ident) => {
         {
-            let capacity = count_integers!($($ints),+; $type);
-            let mut is = PackedIntegers::<$type>::with_capacity(capacity);
+            let capacity = $crate::count_integers!($($ints),+; $type);
+            let mut is = $crate::PackedIntegers::<$type>::with_capacity(capacity);
             $(
                 is.push($ints);
             )*
