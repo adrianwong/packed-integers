@@ -6,11 +6,11 @@ fn append() {
     let mut v2 = packed_ints![3, 4, 5; U9];
     v1.append(&mut v2);
 
-    assert_eq!(v1.get(0).unwrap(), 1);
-    assert_eq!(v1.get(1).unwrap(), 2);
-    assert_eq!(v1.get(2).unwrap(), 3);
-    assert_eq!(v1.get(3).unwrap(), 4);
-    assert_eq!(v1.get(4).unwrap(), 5);
+    assert_eq!(v1.get(0), Some(1));
+    assert_eq!(v1.get(1), Some(2));
+    assert_eq!(v1.get(2), Some(3));
+    assert_eq!(v1.get(3), Some(4));
+    assert_eq!(v1.get(4), Some(5));
     assert_eq!(v1.get(5), None);
     assert!(v2.is_empty());
 }
@@ -21,8 +21,8 @@ fn append_empty() {
     let mut v2 = packed_ints![; U8];
     v1.append(&mut v2);
 
-    assert_eq!(v1.get(0).unwrap(), 1);
-    assert_eq!(v1.get(1).unwrap(), 2);
+    assert_eq!(v1.get(0), Some(1));
+    assert_eq!(v1.get(1), Some(2));
     assert_eq!(v1.get(2), None);
     assert!(v2.is_empty());
 }
@@ -41,11 +41,11 @@ fn get_has_span() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 
     assert_eq!(v.len(), 5);
-    assert_eq!(v.get(0).unwrap(), 507);
-    assert_eq!(v.get(1).unwrap(), 508);
-    assert_eq!(v.get(2).unwrap(), 509);
-    assert_eq!(v.get(3).unwrap(), 510);
-    assert_eq!(v.get(4).unwrap(), 511);
+    assert_eq!(v.get(0), Some(507));
+    assert_eq!(v.get(1), Some(508));
+    assert_eq!(v.get(2), Some(509));
+    assert_eq!(v.get(3), Some(510));
+    assert_eq!(v.get(4), Some(511));
     assert_eq!(v.get(5), None);
 }
 
@@ -54,11 +54,11 @@ fn get_no_span() {
     let v = packed_ints![251, 252, 253, 254, 255; U8];
 
     assert_eq!(v.len(), 5);
-    assert_eq!(v.get(0).unwrap(), 251);
-    assert_eq!(v.get(1).unwrap(), 252);
-    assert_eq!(v.get(2).unwrap(), 253);
-    assert_eq!(v.get(3).unwrap(), 254);
-    assert_eq!(v.get(4).unwrap(), 255);
+    assert_eq!(v.get(0), Some(251));
+    assert_eq!(v.get(1), Some(252));
+    assert_eq!(v.get(2), Some(253));
+    assert_eq!(v.get(3), Some(254));
+    assert_eq!(v.get(4), Some(255));
     assert_eq!(v.get(5), None);
 }
 
@@ -68,19 +68,19 @@ fn insert() {
     v.insert(0, 4);
 
     assert_eq!(v.len(), 4);
-    assert_eq!(v.get(0).unwrap(), 4);
-    assert_eq!(v.get(1).unwrap(), 1);
-    assert_eq!(v.get(2).unwrap(), 2);
-    assert_eq!(v.get(3).unwrap(), 3);
+    assert_eq!(v.get(0), Some(4));
+    assert_eq!(v.get(1), Some(1));
+    assert_eq!(v.get(2), Some(2));
+    assert_eq!(v.get(3), Some(3));
     assert_eq!(v.get(4), None);
 
     v.insert(2, 5);
     assert_eq!(v.len(), 5);
-    assert_eq!(v.get(0).unwrap(), 4);
-    assert_eq!(v.get(1).unwrap(), 1);
-    assert_eq!(v.get(2).unwrap(), 5);
-    assert_eq!(v.get(3).unwrap(), 2);
-    assert_eq!(v.get(4).unwrap(), 3);
+    assert_eq!(v.get(0), Some(4));
+    assert_eq!(v.get(1), Some(1));
+    assert_eq!(v.get(2), Some(5));
+    assert_eq!(v.get(3), Some(2));
+    assert_eq!(v.get(4), Some(3));
     assert_eq!(v.get(5), None);
 }
 
@@ -90,7 +90,7 @@ fn insert_empty() {
     v.insert(0, 4);
 
     assert_eq!(v.len(), 1);
-    assert_eq!(v.get(0).unwrap(), 4);
+    assert_eq!(v.get(0), Some(4));
 }
 
 #[test]
@@ -99,8 +99,8 @@ fn insert_eq_len() {
     v.insert(1, 4);
 
     assert_eq!(v.len(), 2);
-    assert_eq!(v.get(0).unwrap(), 1);
-    assert_eq!(v.get(1).unwrap(), 4);
+    assert_eq!(v.get(0), Some(1));
+    assert_eq!(v.get(1), Some(4));
 }
 
 #[test]
@@ -115,11 +115,11 @@ fn into_iter_move() {
     let v = packed_ints![251, 252, 253, 254, 255; U8];
 
     let mut iter = v.into_iter();
-    assert_eq!(iter.next().unwrap(), 251);
-    assert_eq!(iter.next().unwrap(), 252);
-    assert_eq!(iter.next().unwrap(), 253);
-    assert_eq!(iter.next().unwrap(), 254);
-    assert_eq!(iter.next().unwrap(), 255);
+    assert_eq!(iter.next(), Some(251));
+    assert_eq!(iter.next(), Some(252));
+    assert_eq!(iter.next(), Some(253));
+    assert_eq!(iter.next(), Some(254));
+    assert_eq!(iter.next(), Some(255));
     assert_eq!(iter.next(), None);
 
     // Moved. Compile error:
@@ -131,11 +131,11 @@ fn into_iter_ref() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 
     let mut iter = (&v).into_iter();
-    assert_eq!(iter.next().unwrap(), 507);
-    assert_eq!(iter.next().unwrap(), 508);
-    assert_eq!(iter.next().unwrap(), 509);
-    assert_eq!(iter.next().unwrap(), 510);
-    assert_eq!(iter.next().unwrap(), 511);
+    assert_eq!(iter.next(), Some(507));
+    assert_eq!(iter.next(), Some(508));
+    assert_eq!(iter.next(), Some(509));
+    assert_eq!(iter.next(), Some(510));
+    assert_eq!(iter.next(), Some(511));
     assert_eq!(iter.next(), None);
 
     // Ok:
@@ -156,11 +156,11 @@ fn iter() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 
     let mut iter = v.iter();
-    assert_eq!(iter.next().unwrap(), 507);
-    assert_eq!(iter.next().unwrap(), 508);
-    assert_eq!(iter.next().unwrap(), 509);
-    assert_eq!(iter.next().unwrap(), 510);
-    assert_eq!(iter.next().unwrap(), 511);
+    assert_eq!(iter.next(), Some(507));
+    assert_eq!(iter.next(), Some(508));
+    assert_eq!(iter.next(), Some(509));
+    assert_eq!(iter.next(), Some(510));
+    assert_eq!(iter.next(), Some(511));
     assert_eq!(iter.next(), None);
 
     // Ok:
@@ -171,18 +171,18 @@ fn iter() {
 fn pop() {
     let mut v = packed_ints![100, 200, 300, 400, 500; U10];
 
-    assert_eq!(v.pop().unwrap(), 500);
-    assert_eq!(v.pop().unwrap(), 400);
-    assert_eq!(v.get(0).unwrap(), 100);
-    assert_eq!(v.get(1).unwrap(), 200);
-    assert_eq!(v.get(2).unwrap(), 300);
+    assert_eq!(v.pop(), Some(500));
+    assert_eq!(v.pop(), Some(400));
+    assert_eq!(v.get(0), Some(100));
+    assert_eq!(v.get(1), Some(200));
+    assert_eq!(v.get(2), Some(300));
     assert_eq!(v.get(3), None);
 
     v.push(600);
-    assert_eq!(v.get(0).unwrap(), 100);
-    assert_eq!(v.get(1).unwrap(), 200);
-    assert_eq!(v.get(2).unwrap(), 300);
-    assert_eq!(v.get(3).unwrap(), 600);
+    assert_eq!(v.get(0), Some(100));
+    assert_eq!(v.get(1), Some(200));
+    assert_eq!(v.get(2), Some(300));
+    assert_eq!(v.get(3), Some(600));
     assert_eq!(v.get(4), None);
 }
 
@@ -197,7 +197,7 @@ fn pop_none() {
 fn pop_one() {
     let mut v = packed_ints![100; U10];
 
-    assert_eq!(v.pop().unwrap(), 100);
+    assert_eq!(v.pop(), Some(100));
     assert_eq!(v.pop(), None);
 }
 
@@ -220,17 +220,17 @@ fn remove() {
     v.remove(0);
 
     assert_eq!(v.len(), 4);
-    assert_eq!(v.get(0).unwrap(), 252);
-    assert_eq!(v.get(1).unwrap(), 253);
-    assert_eq!(v.get(2).unwrap(), 254);
-    assert_eq!(v.get(3).unwrap(), 255);
+    assert_eq!(v.get(0), Some(252));
+    assert_eq!(v.get(1), Some(253));
+    assert_eq!(v.get(2), Some(254));
+    assert_eq!(v.get(3), Some(255));
     assert_eq!(v.get(4), None);
 
     v.remove(2);
     assert_eq!(v.len(), 3);
-    assert_eq!(v.get(0).unwrap(), 252);
-    assert_eq!(v.get(1).unwrap(), 253);
-    assert_eq!(v.get(2).unwrap(), 255);
+    assert_eq!(v.get(0), Some(252));
+    assert_eq!(v.get(1), Some(253));
+    assert_eq!(v.get(2), Some(255));
     assert_eq!(v.get(3), None);
 }
 
@@ -248,11 +248,11 @@ fn set() {
     v.set(2, 150);
     v.set(4, 200);
 
-    assert_eq!(v.get(0).unwrap(), 100);
-    assert_eq!(v.get(1).unwrap(), 252);
-    assert_eq!(v.get(2).unwrap(), 150);
-    assert_eq!(v.get(3).unwrap(), 254);
-    assert_eq!(v.get(4).unwrap(), 200);
+    assert_eq!(v.get(0), Some(100));
+    assert_eq!(v.get(1), Some(252));
+    assert_eq!(v.get(2), Some(150));
+    assert_eq!(v.get(3), Some(254));
+    assert_eq!(v.get(4), Some(200));
 }
 
 #[test]
@@ -268,15 +268,15 @@ fn truncate() {
     v.truncate(2);
 
     assert_eq!(v.len(), 2);
-    assert_eq!(v.get(0).unwrap(), 251);
-    assert_eq!(v.get(1).unwrap(), 252);
+    assert_eq!(v.get(0), Some(251));
+    assert_eq!(v.get(1), Some(252));
     assert_eq!(v.get(2), None);
 
     v.push(200);
     assert_eq!(v.len(), 3);
-    assert_eq!(v.get(0).unwrap(), 251);
-    assert_eq!(v.get(1).unwrap(), 252);
-    assert_eq!(v.get(2).unwrap(), 200);
+    assert_eq!(v.get(0), Some(251));
+    assert_eq!(v.get(1), Some(252));
+    assert_eq!(v.get(2), Some(200));
     assert_eq!(v.get(3), None);
 }
 
@@ -286,10 +286,10 @@ fn truncate_gt() {
     v.truncate(10);
 
     assert_eq!(v.len(), 5);
-    assert_eq!(v.get(0).unwrap(), 251);
-    assert_eq!(v.get(1).unwrap(), 252);
-    assert_eq!(v.get(2).unwrap(), 253);
-    assert_eq!(v.get(3).unwrap(), 254);
-    assert_eq!(v.get(4).unwrap(), 255);
+    assert_eq!(v.get(0), Some(251));
+    assert_eq!(v.get(1), Some(252));
+    assert_eq!(v.get(2), Some(253));
+    assert_eq!(v.get(3), Some(254));
+    assert_eq!(v.get(4), Some(255));
     assert_eq!(v.get(5), None);
 }
