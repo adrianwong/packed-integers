@@ -1,4 +1,5 @@
 use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
+use std::fmt::{self, Debug, Formatter};
 use std::marker::PhantomData;
 
 mod packed_int;
@@ -314,6 +315,13 @@ impl<T: PackedInt> Ord for PackedIntegers<T> {
 impl<T: PackedInt> PartialOrd for PackedIntegers<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl<T: PackedInt> Debug for PackedIntegers<T> {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+        write!(formatter, "(U{}) ", T::NUM_BITS)?;
+        formatter.debug_list().entries(self.iter()).finish()
     }
 }
 
