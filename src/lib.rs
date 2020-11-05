@@ -59,6 +59,7 @@ pub use crate::packed_int::*;
 ///
 /// let mut is_u9 = packed_ints![509, 510, 511; U9];
 /// ```
+#[derive(Clone)]
 pub struct PackedIntegers<T: PackedInt> {
     buf: Vec<u32>,
     len: usize,

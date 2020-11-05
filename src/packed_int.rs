@@ -1,33 +1,64 @@
+#[derive(Clone)]
 pub enum U1 {}
+#[derive(Clone)]
 pub enum U2 {}
+#[derive(Clone)]
 pub enum U3 {}
+#[derive(Clone)]
 pub enum U4 {}
+#[derive(Clone)]
 pub enum U5 {}
+#[derive(Clone)]
 pub enum U6 {}
+#[derive(Clone)]
 pub enum U7 {}
+#[derive(Clone)]
 pub enum U8 {}
+#[derive(Clone)]
 pub enum U9 {}
+#[derive(Clone)]
 pub enum U10 {}
+#[derive(Clone)]
 pub enum U11 {}
+#[derive(Clone)]
 pub enum U12 {}
+#[derive(Clone)]
 pub enum U13 {}
+#[derive(Clone)]
 pub enum U14 {}
+#[derive(Clone)]
 pub enum U15 {}
+#[derive(Clone)]
 pub enum U16 {}
+#[derive(Clone)]
 pub enum U17 {}
+#[derive(Clone)]
 pub enum U18 {}
+#[derive(Clone)]
 pub enum U19 {}
+#[derive(Clone)]
 pub enum U20 {}
+#[derive(Clone)]
 pub enum U21 {}
+#[derive(Clone)]
 pub enum U22 {}
+#[derive(Clone)]
 pub enum U23 {}
+#[derive(Clone)]
 pub enum U24 {}
+#[derive(Clone)]
 pub enum U25 {}
+#[derive(Clone)]
 pub enum U26 {}
+#[derive(Clone)]
 pub enum U27 {}
+#[derive(Clone)]
 pub enum U28 {}
+#[derive(Clone)]
 pub enum U29 {}
+#[derive(Clone)]
 pub enum U30 {}
+#[derive(Clone)]
 pub enum U31 {}
 
 /// A trait for packed integer types.

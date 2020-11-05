@@ -29,6 +29,16 @@ fn clear() {
 }
 
 #[test]
+fn clone() {
+    let mut v1 = packed_ints![251, 252, 253, 254, 255; U8];
+    let v2 = v1.clone();
+
+    v1.clear();
+    assert!(v1.is_empty());
+    assert_eq!(v2, packed_ints![251, 252, 253, 254, 255; U8]);
+}
+
+#[test]
 fn get_has_span() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 
