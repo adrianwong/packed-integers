@@ -7,13 +7,7 @@ fn append() {
     let mut v2 = packed_ints![3, 4, 5; U9];
     v1.append(&mut v2);
 
-    assert_eq!(v1.get(0), Some(1));
-    assert_eq!(v1.get(1), Some(2));
-    assert_eq!(v1.get(2), Some(3));
-    assert_eq!(v1.get(3), Some(4));
-    assert_eq!(v1.get(4), Some(5));
-    assert_eq!(v1.get(5), None);
-    assert!(v2.is_empty());
+    assert_eq!(v1, packed_ints![1, 2, 3, 4, 5; U9]);
 }
 
 #[test]
@@ -22,10 +16,7 @@ fn append_empty() {
     let mut v2 = packed_ints![; U8];
     v1.append(&mut v2);
 
-    assert_eq!(v1.get(0), Some(1));
-    assert_eq!(v1.get(1), Some(2));
-    assert_eq!(v1.get(2), None);
-    assert!(v2.is_empty());
+    assert_eq!(v1, packed_ints![1, 2; U8]);
 }
 
 #[test]
@@ -34,7 +25,7 @@ fn clear() {
     v.clear();
 
     assert_eq!(v.len(), 0);
-    assert_eq!(v.get(0), None);
+    assert_eq!(v, packed_ints![; U8]);
 }
 
 #[test]
@@ -69,20 +60,11 @@ fn insert() {
     v.insert(0, 4);
 
     assert_eq!(v.len(), 4);
-    assert_eq!(v.get(0), Some(4));
-    assert_eq!(v.get(1), Some(1));
-    assert_eq!(v.get(2), Some(2));
-    assert_eq!(v.get(3), Some(3));
-    assert_eq!(v.get(4), None);
+    assert_eq!(v, packed_ints![4, 1, 2, 3; U8]);
 
     v.insert(2, 5);
     assert_eq!(v.len(), 5);
-    assert_eq!(v.get(0), Some(4));
-    assert_eq!(v.get(1), Some(1));
-    assert_eq!(v.get(2), Some(5));
-    assert_eq!(v.get(3), Some(2));
-    assert_eq!(v.get(4), Some(3));
-    assert_eq!(v.get(5), None);
+    assert_eq!(v, packed_ints![4, 1, 5, 2, 3; U8]);
 }
 
 #[test]
@@ -91,7 +73,7 @@ fn insert_empty() {
     v.insert(0, 4);
 
     assert_eq!(v.len(), 1);
-    assert_eq!(v.get(0), Some(4));
+    assert_eq!(v, packed_ints![4; U8]);
 }
 
 #[test]
@@ -100,8 +82,7 @@ fn insert_eq_len() {
     v.insert(1, 4);
 
     assert_eq!(v.len(), 2);
-    assert_eq!(v.get(0), Some(1));
-    assert_eq!(v.get(1), Some(4));
+    assert_eq!(v, packed_ints![1, 4; U8]);
 }
 
 #[test]
@@ -223,17 +204,10 @@ fn pop() {
 
     assert_eq!(v.pop(), Some(500));
     assert_eq!(v.pop(), Some(400));
-    assert_eq!(v.get(0), Some(100));
-    assert_eq!(v.get(1), Some(200));
-    assert_eq!(v.get(2), Some(300));
-    assert_eq!(v.get(3), None);
+    assert_eq!(v, packed_ints![100, 200, 300; U10]);
 
     v.push(600);
-    assert_eq!(v.get(0), Some(100));
-    assert_eq!(v.get(1), Some(200));
-    assert_eq!(v.get(2), Some(300));
-    assert_eq!(v.get(3), Some(600));
-    assert_eq!(v.get(4), None);
+    assert_eq!(v, packed_ints![100, 200, 300, 600; U10]);
 }
 
 #[test]
@@ -255,6 +229,8 @@ fn pop_one() {
 fn push_eq_max() {
     let mut v = PackedIntegers::<U10>::new();
     v.push(1023);
+
+    assert_eq!(v, packed_ints![1023; U10]);
 }
 
 #[test]
@@ -270,18 +246,11 @@ fn remove() {
     v.remove(0);
 
     assert_eq!(v.len(), 4);
-    assert_eq!(v.get(0), Some(252));
-    assert_eq!(v.get(1), Some(253));
-    assert_eq!(v.get(2), Some(254));
-    assert_eq!(v.get(3), Some(255));
-    assert_eq!(v.get(4), None);
+    assert_eq!(v, packed_ints![252, 253, 254, 255; U8]);
 
     v.remove(2);
     assert_eq!(v.len(), 3);
-    assert_eq!(v.get(0), Some(252));
-    assert_eq!(v.get(1), Some(253));
-    assert_eq!(v.get(2), Some(255));
-    assert_eq!(v.get(3), None);
+    assert_eq!(v, packed_ints![252, 253, 255; U8]);
 }
 
 #[test]
@@ -298,11 +267,7 @@ fn set() {
     v.set(2, 150);
     v.set(4, 200);
 
-    assert_eq!(v.get(0), Some(100));
-    assert_eq!(v.get(1), Some(252));
-    assert_eq!(v.get(2), Some(150));
-    assert_eq!(v.get(3), Some(254));
-    assert_eq!(v.get(4), Some(200));
+    assert_eq!(v, packed_ints![100, 252, 150, 254, 200; U8]);
 }
 
 #[test]
@@ -318,16 +283,11 @@ fn truncate() {
     v.truncate(2);
 
     assert_eq!(v.len(), 2);
-    assert_eq!(v.get(0), Some(251));
-    assert_eq!(v.get(1), Some(252));
-    assert_eq!(v.get(2), None);
+    assert_eq!(v, packed_ints![251, 252; U8]);
 
     v.push(200);
     assert_eq!(v.len(), 3);
-    assert_eq!(v.get(0), Some(251));
-    assert_eq!(v.get(1), Some(252));
-    assert_eq!(v.get(2), Some(200));
-    assert_eq!(v.get(3), None);
+    assert_eq!(v, packed_ints![251, 252, 200; U8]);
 }
 
 #[test]
@@ -336,10 +296,5 @@ fn truncate_gt() {
     v.truncate(10);
 
     assert_eq!(v.len(), 5);
-    assert_eq!(v.get(0), Some(251));
-    assert_eq!(v.get(1), Some(252));
-    assert_eq!(v.get(2), Some(253));
-    assert_eq!(v.get(3), Some(254));
-    assert_eq!(v.get(4), Some(255));
-    assert_eq!(v.get(5), None);
+    assert_eq!(v, packed_ints![251, 252, 253, 254, 255; U8]);
 }
