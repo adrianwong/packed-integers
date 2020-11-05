@@ -30,8 +30,12 @@ pub enum U29 {}
 pub enum U30 {}
 pub enum U31 {}
 
+/// A trait for packed integer types.
 pub trait PackedInt {
+    /// The number of bits in this integer type.
     const NUM_BITS: usize;
+
+    /// The largest value this integer type can hold.
     const MAX: u32 = (1 << Self::NUM_BITS) - 1;
 }
 

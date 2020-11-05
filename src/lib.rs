@@ -1,3 +1,20 @@
+//! `packed_integers` provides a growable array for integer types in the range `u1` to `u31`.
+//!
+//! # Use case
+//!
+//! Assume you have a sequence of unsigned integers in the range [0, 100000] that you would like to
+//! hold in memory. That range of values can be represented using 17 bits per integer, since
+//! 2<sup>17</sup> - 1 = 131071. As Rust has no `u17` type, you would typically store these values
+//! in a `u32` array, wasting 15 bits per integer.
+//!
+//! `packed_integers` helps alleviate this issue by packing these integers at the bit level,
+//! essentially trading time for space.
+//!
+//! # API
+//!
+//! Where possible, `packed_integers` mimics the API for Rust's `Vec` in order to provide a set of
+//! methods you're probably already familiar with.
+
 use std::cmp::{Eq, Ord, Ordering, PartialEq, PartialOrd};
 use std::fmt::{self, Debug, Formatter};
 use std::marker::PhantomData;
@@ -5,6 +22,43 @@ use std::marker::PhantomData;
 mod packed_int;
 pub use crate::packed_int::*;
 
+/// A growable array of packed integers, backed by a `Vec<u32>` buffer.
+///
+/// # Examples
+///
+/// ```
+/// use packed_integers::{PackedIntegers, U9};
+///
+/// let mut is = PackedIntegers::<U9>::new();
+/// is.push(510);
+/// is.push(511);
+///
+/// assert_eq!(is.len(), 2);
+/// assert_eq!(is.get(0), Some(510));
+///
+/// assert_eq!(is.pop(), Some(511));
+/// assert_eq!(is.len(), 1);
+///
+/// is.set(0, 509);
+/// assert_eq!(is.get(0), Some(509));
+///
+/// // This will panic, as 512 > U9::MAX.
+/// // is.push(512);
+///
+/// for i in &is {
+///     println!("{}", i);
+/// }
+/// ```
+///
+/// The `packed_ints!` macro makes initialisation more convenient:
+///
+/// ```
+/// use packed_integers::{packed_ints, U7, U9};
+///
+/// let mut is_u7 = packed_ints![125, 126, 127; U7];
+///
+/// let mut is_u9 = packed_ints![509, 510, 511; U9];
+/// ```
 pub struct PackedIntegers<T: PackedInt> {
     buf: Vec<u32>,
     len: usize,
@@ -14,6 +68,15 @@ pub struct PackedIntegers<T: PackedInt> {
 impl<T: PackedInt> PackedIntegers<T> {
     const U32_NUM_BITS: usize = 32;
 
+    /// Constructs a new, empty `PackedIntegers<T>`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{PackedIntegers, U9};
+    ///
+    /// let mut is = PackedIntegers::<U9>::new();
+    /// ```
     pub fn new() -> PackedIntegers<T> {
         PackedIntegers {
             buf: Vec::new(),
@@ -22,6 +85,19 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    /// Constructs a new, empty `PackedIntegers<T>` with _at least_ the specified capacity.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{PackedIntegers, U8};
+    ///
+    /// let mut is = PackedIntegers::<U8>::with_capacity(1);
+    ///
+    /// // The specified capacity is 1, but because `PackedIntegers` is backed by a `Vec<u32>`
+    /// // buffer, it will actually hold 4 `U8`s without reallocating.
+    /// assert_eq!(is.capacity(), 4);
+    /// ```
     pub fn with_capacity(capacity: usize) -> PackedIntegers<T> {
         let capacity = Self::to_buf_capacity(capacity);
 
@@ -32,6 +108,20 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    /// Moves all integers of `other` into `Self`, leaving `other` empty.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U8};
+    ///
+    /// let mut is1 = packed_ints![10, 20, 30; U8];
+    /// let mut is2 = packed_ints![40, 50, 60; U8];
+    /// is1.append(&mut is2);
+    ///
+    /// assert_eq!(is1, packed_ints![10, 20, 30, 40, 50, 60; U8]);
+    /// assert!(is2.is_empty());
+    /// ```
     pub fn append(&mut self, other: &mut Self) {
         self.reserve(other.len);
 
@@ -41,14 +131,52 @@ impl<T: PackedInt> PackedIntegers<T> {
         other.clear();
     }
 
+    /// Returns the number of integers the vector can hold without reallocating.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{PackedIntegers, U8};
+    ///
+    /// let mut is = PackedIntegers::<U8>::with_capacity(1);
+    ///
+    /// // The specified capacity is 1, but because `PackedIntegers` is backed by a `Vec<u32>`
+    /// // buffer, it will actually hold 4 `U8`s without reallocating.
+    /// assert_eq!(is.capacity(), 4);
+    /// ```
     pub fn capacity(&self) -> usize {
         self.buf.capacity() * Self::U32_NUM_BITS / T::NUM_BITS
     }
 
+    /// Clears the vector. This method does not affect the vector's allocated capacity.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U9};
+    ///
+    /// let mut is = packed_ints![100, 200, 300; U9];
+    ///
+    /// is.clear();
+    ///
+    /// assert!(is.is_empty());
+    /// ```
     pub fn clear(&mut self) {
         self.truncate(0)
     }
 
+    /// Returns the value of the integer at position `index`, or `None` if out of bounds.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U9};
+    ///
+    /// let mut is = packed_ints![100, 200, 300; U9];
+    ///
+    /// assert_eq!(is.get(1), Some(200));
+    /// assert_eq!(is.get(3), None);
+    /// ```
     pub fn get(&self, index: usize) -> Option<u32> {
         if index >= self.len {
             None
@@ -73,6 +201,21 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    /// Inserts an integer at position `index`, shifting all integers after it to the right.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U8};
+    ///
+    /// let mut is = packed_ints![10, 20, 30; U8];
+    ///
+    /// is.insert(1, 40);
+    /// assert_eq!(is, packed_ints![10, 40, 20, 30; U8]);
+    ///
+    /// is.insert(4, 50);
+    /// assert_eq!(is, packed_ints![10, 40, 20, 30, 50; U8]);
+    /// ```
     pub fn insert(&mut self, index: usize, value: u32) {
         if index > self.len {
             panic!(
@@ -88,18 +231,69 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.set_unchecked(index, value);
     }
 
+    /// Returns `true` if the vector contains no integers.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{PackedIntegers, U8};
+    ///
+    /// let mut is = PackedIntegers::<U8>::new();
+    /// assert!(is.is_empty());
+    ///
+    /// is.push(255);
+    /// assert!(!is.is_empty());
+    /// ```
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
 
+    /// Returns an iterator over the vector.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U9};
+    ///
+    /// let is = packed_ints![509, 510, 511; U9];
+    /// let mut iter = is.iter();
+    ///
+    /// assert_eq!(iter.next(), Some(509));
+    /// assert_eq!(iter.next(), Some(510));
+    /// assert_eq!(iter.next(), Some(511));
+    /// assert_eq!(iter.next(), None);
+    /// ```
     pub fn iter(&self) -> PackedIntegersIterator<'_, T> {
         self.into_iter()
     }
 
+    /// Returns the number of integers in the vector.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U9};
+    ///
+    /// let is = packed_ints![507, 508, 509, 510, 511; U9];
+    ///
+    /// assert_eq!(is.len(), 5);
+    /// ```
     pub fn len(&self) -> usize {
         self.len
     }
 
+    /// Removes the last integer from the vector and returns it, or `None` if empty.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U10};
+    ///
+    /// let mut is = packed_ints![100, 200, 300; U10];
+    ///
+    /// assert_eq!(is.pop(), Some(300));
+    /// assert_eq!(is, packed_ints![100, 200; U10]);
+    /// ```
     pub fn pop(&mut self) -> Option<u32> {
         if self.len == 0 {
             None
@@ -109,6 +303,18 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    /// Appends an integer to the back of the vector.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U10};
+    ///
+    /// let mut is = packed_ints![100, 200; U10];
+    /// is.push(300);
+    ///
+    /// assert_eq!(is, packed_ints![100, 200, 300; U10]);
+    /// ```
     pub fn push(&mut self, value: u32) {
         if value > T::MAX {
             panic!("value is outside the range 0..={}", T::MAX);
@@ -139,6 +345,19 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.len += 1;
     }
 
+    /// Removes and returns the integer at position `index`, shifting all integers after it to the
+    /// left.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U8};
+    ///
+    /// let mut is = packed_ints![10, 20, 30; U8];
+    ///
+    /// assert_eq!(is.remove(1), 20);
+    /// assert_eq!(is, packed_ints![10, 30; U8]);
+    /// ```
     pub fn remove(&mut self, index: usize) -> u32 {
         if index >= self.len {
             panic!(
@@ -157,6 +376,18 @@ impl<T: PackedInt> PackedIntegers<T> {
         result
     }
 
+    /// Reserves capacity for _at least_ `additional` more integers to be inserted.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U8};
+    ///
+    /// let mut is = packed_ints![100; U8];
+    /// is.reserve(4);
+    ///
+    /// assert!(is.capacity() >= 5);
+    /// ```
     pub fn reserve(&mut self, additional: usize) {
         if self.capacity() >= self.len + additional {
             return;
@@ -165,6 +396,18 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.buf.reserve(additional);
     }
 
+    /// Sets the integer value at `index` to `value`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U9};
+    ///
+    /// let mut is = packed_ints![100, 200, 300; U9];
+    /// is.set(1, 400);
+    ///
+    /// assert_eq!(is, packed_ints![100, 400, 300; U9]);
+    /// ```
     pub fn set(&mut self, index: usize, value: u32) {
         if index >= self.len {
             panic!(
@@ -198,6 +441,18 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    /// Keeps the first `len` integers, and drops the rest.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U9};
+    ///
+    /// let mut is = packed_ints![100, 200, 300, 400, 500; U9];
+    /// is.truncate(2);
+    ///
+    /// assert_eq!(is, packed_ints![100, 200; U9]);
+    /// ```
     pub fn truncate(&mut self, len: usize) {
         if len > self.len {
             return;
@@ -226,6 +481,7 @@ impl<T: PackedInt> PackedIntegers<T> {
     }
 }
 
+/// A consuming iterator for `PackedIntegers`.
 pub struct PackedIntegersIntoIterator<T: PackedInt> {
     vec: PackedIntegers<T>,
     index: usize,
@@ -254,6 +510,7 @@ impl<T: PackedInt> Iterator for PackedIntegersIntoIterator<T> {
     }
 }
 
+/// An iterator for `PackedIntegers`.
 pub struct PackedIntegersIterator<'a, T: PackedInt> {
     vec: &'a PackedIntegers<T>,
     index: usize,
@@ -335,6 +592,7 @@ macro_rules! count_integers {
     };
 }
 
+/// A macro for a more convenient initialisation of `PackedIntegers`.
 #[macro_export]
 macro_rules! packed_ints {
     (; $type:ident) => {
