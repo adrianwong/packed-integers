@@ -1,5 +1,13 @@
 [package]
 name = "packed-integers"
 version = "0.1.0"
-authors = ["Adrian Wong <adrianwjw@gmail.com>"]
 edition = "2018"
+
+description = "A growable array for integer types in the range `u1` to `u31`."
+keywords = ["integer", "compression"]
+categories = ["data-structures"]
+
+repository = "https://github.com/adrianwong/packed-integers"
+license = "MIT"
+
+authors = ["Adrian Wong <adrianwjw@gmail.com>"]
