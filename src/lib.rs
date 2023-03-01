@@ -109,6 +109,19 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    pub fn from_vec(vec: Vec<u32>, amount_of_integers: usize) -> PackedIntegers<T> {
+        let min = (((amount_of_integers * T::NUM_BITS) as f32)/ (Self::U32_NUM_BITS as f32)).ceil() as usize;
+        if vec.len() < min {
+            panic!("Wrong amount of integers given for PackedIntegers<U{}>::from_vec, the length of the vector is too small ({}, should be at least {}).",
+                   T::NUM_BITS, vec.len(), min)
+        }
+        PackedIntegers {
+            buf: vec,
+            len: amount_of_integers,
+            phantom: PhantomData,
+        }
+    }
+
     /// Moves all integers of `other` into `Self`, leaving `other` empty.
     ///
     /// # Example
@@ -479,6 +492,10 @@ impl<T: PackedInt> PackedIntegers<T> {
     #[inline]
     fn to_buf_capacity(capacity: usize) -> usize {
         (T::NUM_BITS * capacity + (Self::U32_NUM_BITS - 1)) / Self::U32_NUM_BITS
+    }
+
+    pub fn get_buf(&self) -> &Vec<u32> {
+        &self.buf
     }
 }
 
