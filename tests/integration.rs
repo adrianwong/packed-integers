@@ -39,6 +39,86 @@ fn clone() {
 }
 
 #[test]
+fn from_vec_u8_eq() {
+    let b = vec![0b11111110_11111101_11111100_11111011];
+    let v = PackedIntegers::<U8>::from_vec(b, 4);
+
+    assert_eq!(v.get(0), Some(0b11111011));
+    assert_eq!(v.get(1), Some(0b11111100));
+    assert_eq!(v.get(2), Some(0b11111101));
+    assert_eq!(v.get(3), Some(0b11111110));
+    assert_eq!(v.get(4), None);
+}
+
+#[test]
+#[should_panic]
+fn from_vec_u8_gt() {
+    let b = vec![0b11111110_11111101_11111100_11111011];
+    let _v = PackedIntegers::<U8>::from_vec(b, 5);
+}
+
+#[test]
+fn from_vec_u8_lt() {
+    let b = vec![0b11111110_11111101_11111100_11111011];
+    let v = PackedIntegers::<U8>::from_vec(b, 3);
+
+    assert_eq!(v.get(0), Some(0b11111011));
+    assert_eq!(v.get(1), Some(0b11111100));
+    assert_eq!(v.get(2), Some(0b11111101));
+    assert_eq!(v.get(3), None);
+}
+
+#[test]
+fn from_vec_u9_eq() {
+    let b = vec![
+        0b10011_111111101_111111100_111111011,
+        0b111111111_111111110_1100,
+    ];
+    let v = PackedIntegers::<U9>::from_vec(b, 6);
+
+    assert_eq!(v.get(0), Some(0b111111011));
+    assert_eq!(v.get(1), Some(0b111111100));
+    assert_eq!(v.get(2), Some(0b111111101));
+    assert_eq!(v.get(3), Some(0b110010011));
+    assert_eq!(v.get(4), Some(0b111111110));
+    assert_eq!(v.get(5), Some(0b111111111));
+    assert_eq!(v.get(6), None);
+}
+
+#[test]
+fn from_vec_u9_gt() {
+    let b = vec![
+        0b10011_111111101_111111100_111111011,
+        0b111111111_111111110_1100,
+    ];
+    let v = PackedIntegers::<U9>::from_vec(b, 7);
+
+    assert_eq!(v.get(0), Some(0b111111011));
+    assert_eq!(v.get(1), Some(0b111111100));
+    assert_eq!(v.get(2), Some(0b111111101));
+    assert_eq!(v.get(3), Some(0b110010011));
+    assert_eq!(v.get(4), Some(0b111111110));
+    assert_eq!(v.get(5), Some(0b111111111));
+    assert_eq!(v.get(6), Some(0));
+    assert_eq!(v.get(7), None);
+}
+
+#[test]
+fn from_vec_u9_lt() {
+    let b = vec![
+        0b10011_111111101_111111100_111111011,
+        0b111111111_111111110_1100,
+    ];
+    let v = PackedIntegers::<U9>::from_vec(b, 4);
+
+    assert_eq!(v.get(0), Some(0b111111011));
+    assert_eq!(v.get(1), Some(0b111111100));
+    assert_eq!(v.get(2), Some(0b111111101));
+    assert_eq!(v.get(3), Some(0b110010011));
+    assert_eq!(v.get(4), None);
+}
+
+#[test]
 fn get_has_span() {
     let v = packed_ints![507, 508, 509, 510, 511; U9];
 

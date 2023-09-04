@@ -166,6 +166,45 @@ impl<T: PackedInt> PackedIntegers<T> {
         self.truncate(0)
     }
 
+    /// Creates an array of packed integers from a supplied `Vec<u32>` buffer.
+    /// Panics if `num_ints * T::NUM_BITS` is greater than the number of bits
+    /// the buffer has.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{PackedIntegers, U8};
+    ///
+    /// let buf = vec![0b00000001_00000010_00000100_00001000];
+    /// let is = PackedIntegers::<U8>::from_vec(buf, 4);
+    ///
+    /// assert_eq!(is.get(0), Some(0b1000));
+    /// assert_eq!(is.get(1), Some(0b0100));
+    /// assert_eq!(is.get(2), Some(0b0010));
+    /// assert_eq!(is.get(3), Some(0b0001));
+    /// assert_eq!(is.get(4), None);
+    /// ```
+    pub fn from_vec(buf: Vec<u32>, num_ints: usize) -> PackedIntegers<T> {
+        let total_bits = num_ints * T::NUM_BITS;
+        let mut min_len = total_bits / Self::U32_NUM_BITS;
+        if total_bits % Self::U32_NUM_BITS > 0 {
+            min_len += 1;
+        }
+        if buf.len() < min_len {
+            panic!(
+                "vector is too small (len {}, should be at least {})",
+                buf.len(),
+                min_len
+            );
+        }
+
+        PackedIntegers {
+            buf,
+            len: num_ints,
+            phantom: PhantomData,
+        }
+    }
+
     /// Returns the value of the integer at position `index`, or `None` if out of bounds.
     ///
     /// # Example
