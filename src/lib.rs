@@ -481,6 +481,42 @@ impl<T: PackedInt> PackedIntegers<T> {
         }
     }
 
+    /// Returns a copy of the backing `Vec<u32>` buffer.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use packed_integers::{packed_ints, U8};
+    ///
+    /// let is = packed_ints![
+    ///     0b0001,
+    ///     0b0010,
+    ///     0b0100,
+    ///     0b1000;
+    /// U8];
+    /// let vec = is.to_vec();
+    ///
+    /// assert_eq!(vec.len(), 1);
+    /// assert_eq!(vec[0], 0b00001000_00000100_00000010_00000001);
+    /// ```
+    pub fn to_vec(&self) -> Vec<u32> {
+        let buf_index = Self::buf_index(self.len);
+        let start_bit = Self::start_bit(self.len);
+
+        // Certain functions "remove" integers by setting the struct's `len` value. A side effect
+        // of this optimisation is that the actual contents of the backing vector may not be what
+        // is expected. Ensure that any lingering integers are cleaned up prior to returning this
+        // copy.
+        let mut vec;
+        if start_bit > 0 {
+            vec = self.buf[0..=buf_index].to_vec();
+            vec[buf_index] &= !(u32::MAX << start_bit);
+        } else {
+            vec = self.buf[0..buf_index].to_vec();
+        }
+        vec
+    }
+
     /// Keeps the first `len` integers, and drops the rest.
     ///
     /// # Example

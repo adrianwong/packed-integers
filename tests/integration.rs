@@ -368,6 +368,121 @@ fn set_oob() {
 }
 
 #[test]
+fn to_vec_clear() {
+    let mut v = packed_ints![
+        0b11111011,
+        0b11111100,
+        0b11111101,
+        0b11111110;
+    U8];
+    v.clear();
+    let b = v.to_vec();
+
+    assert!(b.is_empty());
+}
+
+#[test]
+fn to_vec_pop() {
+    let mut v = packed_ints![
+        0b111111011,
+        0b111111100,
+        0b111111101,
+        0b110010011,
+        0b111111110,
+        0b111111111;
+    U9];
+    v.pop();
+    v.pop();
+    let b = v.to_vec();
+
+    assert_eq!(b.len(), 2);
+    assert_eq!(b[1], 0b1100);
+    assert_eq!(b[0], 0b10011_111111101_111111100_111111011);
+}
+
+#[test]
+fn to_vec_remove() {
+    let mut v = packed_ints![
+        0b111111011,
+        0b111111100,
+        0b111111101,
+        0b110010011,
+        0b111111110,
+        0b111111111;
+    U9];
+    v.remove(1);
+    let b = v.to_vec();
+
+    assert_eq!(b.len(), 2);
+    assert_eq!(b[1], 0b111111111_1111);
+    assert_eq!(b[0], 0b11110_110010011_111111101_111111011);
+}
+
+#[test]
+fn to_vec_truncate() {
+    let mut v = packed_ints![
+        0b111111011,
+        0b111111100,
+        0b111111101,
+        0b110010011,
+        0b111111110,
+        0b111111111;
+    U9];
+    v.truncate(3);
+    let b = v.to_vec();
+
+    assert_eq!(b.len(), 1);
+    assert_eq!(b[0], 0b111111101_111111100_111111011);
+}
+
+#[test]
+fn to_vec_u8_no_span() {
+    let v = packed_ints![
+        0b11111011,
+        0b11111100,
+        0b11111101,
+        0b11111110;
+    U8];
+    let b = v.to_vec();
+
+    assert_eq!(b.len(), 1);
+    assert_eq!(b[0], 0b11111110_11111101_11111100_11111011);
+}
+
+#[test]
+fn to_vec_u8_span() {
+    let v = packed_ints![
+        0b11111011,
+        0b11111100,
+        0b11111101,
+        0b11111110,
+        0b10010001;
+    U8];
+    let b = v.to_vec();
+
+    assert_eq!(b.len(), 2);
+    assert_eq!(b[1], 0b10010001);
+    assert_eq!(b[0], 0b11111110_11111101_11111100_11111011);
+}
+
+#[test]
+fn to_vec_u9() {
+    let v = packed_ints![
+        0b111111011,
+        0b111111100,
+        0b111111101,
+        0b110010011,
+        0b111111110,
+        0b111111111;
+    U9];
+    let b = v.to_vec();
+
+    assert_eq!(b.len(), 2);
+    assert_eq!(b[1], 0b111111111_111111110_1100);
+    assert_eq!(b[0], 0b10011_111111101_111111100_111111011);
+}
+
+#[test]
 fn truncate() {
     let mut v = packed_ints![251, 252, 253, 254, 255; U8];
     v.truncate(2);
