@@ -339,7 +339,7 @@ impl<T: PackedInt> PackedIntegers<T> {
             self.buf[buf_index] &= !(T::MAX << start_bit);
             self.buf[buf_index] |= value << start_bit;
 
-            self.buf[buf_index + 1] = !(T::MAX >> (Self::U32_NUM_BITS - start_bit));
+            self.buf[buf_index + 1] &= !(T::MAX >> (Self::U32_NUM_BITS - start_bit));
             self.buf[buf_index + 1] |= value >> available_bits;
         }
 
