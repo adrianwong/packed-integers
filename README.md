@@ -1,5 +1,8 @@
 # packed-integers
 
+[![Version](https://img.shields.io/crates/v/packed-integers.svg)](https://crates.io/crates/packed-integers)
+[![Documentation](https://docs.rs/packed-integers/badge.svg)](https://docs.rs/packed-integers)
+
 `packed_integers` provides a growable array for integer types in the range `u1` to `u31`.
 
 ## Use case
